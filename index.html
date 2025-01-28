@@ -171,7 +171,7 @@
         const aiResponse = data.candidates[0].content.parts[0].text; // 👈 Gemini API 응답 구조에 맞춰 응답 텍스트 추출
 
         // 🤖 AI 응답 화면에 표시
-        messagesDiv.innerHTML += `<div>🤖 Gemini AI: ${aiResponse}</div>`; // 👈 AI 이름 Gemini AI로 변경
+        messagesDiv.innerHTML += `<div>🤖 통도AI: ${aiResponse}</div>`; // 👈 AI 이름 Gemini AI로 변경
     
         document.getElementById('input').value = ''; // 메시지 입력창 초기화 (기존 코드와 동일)
     }
