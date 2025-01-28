@@ -4,113 +4,133 @@
 <head>
     <title>통쾌한 도전을 위한 AI 챗봇</title>
     <style>
-        body {
-        font-family: 'Noto Sans KR', sans-serif; /* ✨ 예쁜 폰트! (Noto Sans Korean) ✨ */
-        margin: 0; /* body 기본 margin 제거 */
-        padding: 0; /* body 기본 padding 제거 */
-        background-color: #f0f0f0; /* 전체 배경색: 밝은 회색 */
-        display: flex; /* flexbox 레이아웃 사용 */
-        justify-content: center; /* 가로 중앙 정렬 */
-        align-items: center; /* 세로 중앙 정렬 */
-        min-height: 100vh; /* 최소 높이: 뷰포트 높이 (화면 전체 채우기) */
-        }
+<style>
+    body {
+        font-family: 'Noto Sans KR', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
 
     #login, #chat {
-        background-color: #fff; /* 로그인/채팅창 배경색: 흰색 */
-        border-radius: 15px; /* 둥근 테두리 */
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-        padding: 30px; /* 내부 여백 */
-        text-align: center; /* 텍스트 중앙 정렬 */
-        width: 400px; /* 적당한 너비 */
-        max-width: 90%; /* 최대 너비: 화면 너비의 90% (반응형) */
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        text-align: center;
+        width: 400px;
+        max-width: 90%;
     }
 
     #chat {
-        display: none; /* 채팅창 숨김 (기본) */
-        height: 600px; /* 채팅창 높이 */
-        display: flex; /* flexbox 레이아웃 (세로 방향) */
-        flex-direction: column; /* 요소 세로로 배치 */
+        display: none;
+        height: 600px;
+        display: flex;
+        flex-direction: column; /* ✨ 세로 방향 flexbox ✨ */
     }
 
     #login h3, #chat h3 {
-        margin-top: 0; /* 제목 margin-top 제거 */
-        color: #333; /* 제목 글자색: 진한 회색 */
+        margin-top: 0;
+        color: #333;
     }
 
     #login input, #chat input {
-        padding: 10px; /* 입력창 내부 여백 */
-        margin: 10px 0; /* 입력창 상하 margin */
-        border: 1px solid #ccc; /* 입력창 테두리 */
-        border-radius: 5px; /* 입력창 둥근 테두리 */
-        width: calc(100% - 22px); /* 입력창 너비 (padding, border 고려) */
-        box-sizing: border-box; /* box-sizing: border-box (padding, border가 width에 포함되도록) */
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: calc(100% - 22px);
+        box-sizing: border-box;
     }
 
     #login button, #chat button {
-        padding: 10px 20px; /* 버튼 내부 여백 */
-        background-color: #4CAF50; /* 버튼 배경색: 녹색 */
-        color: white; /* 버튼 글자색: 흰색 */
-        border: none; /* 버튼 테두리 제거 */
-        border-radius: 5px; /* 버튼 둥근 테두리 */
-        cursor: pointer; /* 마우스 커서: 손가락 모양 */
-        font-size: 16px; /* 버튼 글자 크기 */
-        transition: background-color 0.3s ease; /* 배경색 변경 애니메이션 */
+        padding: 10px 20px;
+        background-color: #4CAF50; /* 기본 녹색 버튼 유지 (로그인 버튼) */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
     }
 
     #login button:hover, #chat button:hover {
-        background-color: #45a049; /* 버튼 hover 배경색: 살짝 어두운 녹색 */
+        background-color: #45a049;
     }
 
     #messages {
-        flex-grow: 1; /* messages 영역이 남은 공간 모두 차지 */
-        padding: 20px; /* 메시지 영역 내부 여백 */
-        overflow-y: auto; /* 세로 스크롤 자동 생성 (메시지 넘칠 때) */
-        display: flex; /* flexbox 레이아웃 (세로 방향) */
-        flex-direction: column; /* 요소 세로로 배치 */
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto; /* ✨ 스크롤 자동 생성 ✨ */
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 20px; /* ✨ messages 영역 padding-bottom 추가 (입력창 공간 확보) ✨ */
     }
 
     #messages div {
-        margin-bottom: 10px; /* 메시지 간 간격 */
-        padding: 10px 15px; /* 메시지 버블 내부 여백 */
-        border-radius: 20px; /* 메시지 버블 둥근 테두리 */
-        background-color: #e0e0e0; /* 기본 메시지 버블 배경색: 밝은 회색 */
-        word-wrap: break-word; /* 긴 단어 줄바꿈 */
-        max-width: 80%; /* 메시지 버블 최대 너비 */
+        margin-bottom: 10px;
+        padding: 10px 15px;
+        border-radius: 20px;
+        background-color: #e0e0e0;
+        word-wrap: break-word;
+        max-width: 80%;
     }
 
-    #messages div:nth-child(odd) { /* 홀수 번째 메시지 (사용자 메시지) */
-        background-color: #DCF8C6; /* 사용자 메시지 버블 배경색: 연한 녹색 */
-        align-self: flex-end; /* 사용자 메시지 오른쪽 정렬 */
+    #messages div:nth-child(odd) {
+        background-color: #DCF8C6;
+        align-self: flex-end;
+    }
+
+    /* ✨ 채팅 입력 영역 스타일 시작 ✨ */
+    #chat > div:last-child { /* #chat div 중 마지막 div (입력 영역) */
+        display: flex; /* flexbox 레이아웃 (가로 방향) */
+        margin-top: 20px; /* messages 영역과 간격 */
+        padding: 10px; /* 내부 여백 */
+        border-top: 1px solid #ccc; /* 위쪽 테두리 */
     }
 
     #chat input {
-        margin: 0; /* 채팅 입력창 margin 제거 */
-        border-radius: 0; /* 채팅 입력창 테두리 둥글기 제거 */
-        border-top: 1px solid #ccc; /* 채팅 입력창 위쪽 테두리만 */
-        border-right: none; /* 채팅 입력창 오른쪽 테두리 제거 */
-        border-left: none; /* 채팅 입력창 왼쪽 테두리 제거 */
+        flex-grow: 1; /* 입력창이 남은 공간 모두 차지 */
+        margin: 0;
+        border: none; /* 테두리 제거 */
+        border-radius: 20px; /* 둥근 테두리 (양쪽) */
+        padding: 10px 15px;
+        background-color: #f0f0f0; /* 입력창 배경색: 밝은 회색 */
     }
 
     #chat button {
-        border-radius: 0; /* 채팅 전송 버튼 테두리 둥글기 제거 */
-        border-bottom-right-radius: 15px; /* 채팅 전송 버튼 오른쪽 아래 테두리만 둥글게 (채팅창과 맞춰서) */
-        border-top-right-radius: 15px; /* 채팅 전송 버튼 오른쪽 위 테두리만 둥글게 (채팅창과 맞춰서) */
+        background-color: #2196F3; /* ✨ 파란색 전송 버튼! ✨ */
+        color: white;
+        border: none;
+        border-radius: 20px; /* ✨ 양쪽 둥근 테두리! ✨ */
+        margin-left: 10px; /* 입력창과 간격 */
+        padding: 10px 20px;
     }
 
-    /* 스크롤바 스타일 (선택 사항, Chrome, Edge, Safari 등 Webkit 기반 브라우저) */
+    #chat button:hover {
+        background-color: #0b7dda; /* 버튼 hover 배경색: 살짝 어두운 파란색 */
+    }
+    /* ✨ 채팅 입력 영역 스타일 끝 ✨ */
+
+
+    /* 스크롤바 스타일 (선택 사항) */
     #messages::-webkit-scrollbar {
-        width: 8px; /* 스크롤바 너비 */
+        width: 8px;
     }
 
     #messages::-webkit-scrollbar-thumb {
-        background-color: #888; /* 스크롤바 색상 */
-        border-radius: 4px; /* 스크롤바 둥근 테두리 */
+        background-color: #888;
+        border-radius: 4px;
     }
 
     #messages::-webkit-scrollbar-thumb:hover {
-        background-color: #555; /* 스크롤바 hover 색상 */
+        background-color: #555;
     }
-        #chat { display: none; } /* 처음엔 채팅창 숨김 */
+</style>        #chat { display: none; } /* 처음엔 채팅창 숨김 */
     </style>
 </head>
 <body>
