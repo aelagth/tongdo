@@ -1623,7 +1623,7 @@ print(Ans)
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>df = pd.read_csv('https://raw.githubusercontent.com/Datamanim/pandas/main/mergeTEst.csv',index_col= 0)
+<pre><code class="language-python">df = pd.read_csv('https://raw.githubusercontent.com/Datamanim/pandas/main/mergeTEst.csv',index_col= 0)
 df1 = df.iloc[:4,:]
 df2 = df.iloc[4:,:]
 display(df1)
@@ -1643,7 +1643,7 @@ print(Ans)
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>df3 = df.iloc[:2,:4]
+<pre><code class="language-python">df3 = df.iloc[:2,:4]
 df4 = df.iloc[5:,3:]
 display(df3)
 display(df4)
@@ -1661,7 +1661,7 @@ print(Ans)
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>Ans = pd.concat([df3,df4],join='outer').fillna(0)
+<pre><code class="language-python">Ans = pd.concat([df3,df4],join='outer').fillna(0)
 print(Ans)
 </code></pre>
             </div>
@@ -1675,7 +1675,7 @@ print(Ans)
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>Ans = pd.merge(df5,df6,on='Algeria',how='inner')
+<pre><code class="language-python">Ans = pd.merge(df5,df6,on='Algeria',how='inner')
 print(Ans)
 </code></pre>
             </div>
@@ -1689,7 +1689,7 @@ print(Ans)
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>Ans =pd.merge(df5,df6,on='Algeria',how='outer')
+<pre><code class="language-python">Ans =pd.merge(df5,df6,on='Algeria',how='outer')
 print(Ans)
 </code></pre>
             </div>
