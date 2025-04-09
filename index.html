@@ -170,6 +170,7 @@
 <body class="bg-gray-100">
     <div class="container">
         <h1 class="text-2xl font-semibold mb-4 text-gray-800">Pandas 연습 문제 풀이</h1>
+        <button id="reset-progress-btn" class="mb-4 py-2 px-4 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200">진행 상황 초기화</button>
 
         <div class="problem" data-question-id="q1">
             <h2 class="question"><span class="question-number">Question 1:</span><span class="question-text">다음 URL의 데이터를 로드하라. 데이터는 \t을 기준으로 구분되어있다.<br>(URL: https://raw.githubusercontent.com/Datamanim/pandas/main/lol.csv)</span></h2>
@@ -1692,81 +1693,113 @@ print(Ans)
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // localStorage에서 열린 문제 상태 불러오기
+            // localStorage 키 정의
             const openProblemsStorageKey = 'openPandasProblems';
-            let openProblemIds = new Set(JSON.parse(localStorage.getItem(openProblemsStorageKey) || '[]'));
+            const answerStoragePrefix = 'pandasAnswer_'; // 답변 저장용 키 접두사
 
-            // 모든 질문 요소를 선택합니다.
+            // 모든 문제 div, 질문, 텍스트 입력 영역, 확인 버튼 선택
+            const problemDivs = document.querySelectorAll('.problem');
             const questions = document.querySelectorAll('.question');
-            // 모든 정답 확인 버튼 요소를 선택합니다.
+            const textInputs = document.querySelectorAll('.user-input');
             const checkButtons = document.querySelectorAll('.check-answer-btn');
+            const resetButton = document.getElementById('reset-progress-btn');
 
-             // 페이지 로드 시 저장된 상태 복원
+            // 1. 열린 문제 상태 불러오기 및 복원
+            let openProblemIds = new Set(JSON.parse(localStorage.getItem(openProblemsStorageKey) || '[]'));
             openProblemIds.forEach(id => {
                 const problemDiv = document.querySelector(`.problem[data-question-id="${id}"]`);
                 if (problemDiv) {
                     const questionH2 = problemDiv.querySelector('.question');
                     const userInput = problemDiv.querySelector('.user-input');
                     const checkBtn = problemDiv.querySelector('.check-answer-btn');
-                    // 상태 복원 (열린 상태로 만듦)
                     if (questionH2) questionH2.classList.add('open');
                     if (userInput) userInput.style.display = 'block';
                     if (checkBtn) checkBtn.style.display = 'block';
-                     // Note: Answer and comment visibility is handled by the check button click, not restored here.
+                    // Note: Answer/comment visibility is handled by check button, not restored here.
                 }
             });
 
+            // 2. 저장된 사용자 답안 불러오기 및 복원
+            textInputs.forEach(textarea => {
+                const problemDiv = textarea.closest('.problem');
+                const questionId = problemDiv.dataset.questionId;
+                const answerKey = answerStoragePrefix + questionId;
+                const savedAnswer = localStorage.getItem(answerKey);
+                if (savedAnswer !== null) {
+                    textarea.value = savedAnswer;
+                }
+
+                // 3. 사용자 답안 변경 시 localStorage에 저장
+                textarea.addEventListener('input', function() {
+                    localStorage.setItem(answerKey, this.value);
+                });
+            });
+
+
+            // 4. 질문 클릭 시 토글 로직 (기존 로직 유지 및 localStorage 업데이트)
             questions.forEach(question => {
-                // 각 질문에 클릭 이벤트 리스너를 추가합니다.
                 question.addEventListener('click', function() {
-                    // 클릭된 질문과 관련된 요소들을 찾습니다.
-                    const problemDiv = this.closest('.problem'); // 부모 problem div
-                    const questionId = problemDiv.dataset.questionId; // 데이터 속성에서 ID 가져오기
+                    const problemDiv = this.closest('.problem');
+                    const questionId = problemDiv.dataset.questionId;
                     const userInput = problemDiv.querySelector('.user-input');
                     const checkBtn = problemDiv.querySelector('.check-answer-btn');
                     const answer = problemDiv.querySelector('.answer');
                     const comment = problemDiv.querySelector('.code-comment');
 
-                    // 입력 칸과 확인 버튼의 display 상태를 토글합니다.
-                    const isOpening = !this.classList.contains('open'); // 현재 닫혀있었다면 열리는 중
+                    const isOpening = !this.classList.contains('open');
                     userInput.style.display = isOpening ? 'block' : 'none';
                     checkBtn.style.display = isOpening ? 'block' : 'none';
 
-                    // localStorage 상태 업데이트
+                    // localStorage 상태 업데이트 (열기/닫기)
                     if (isOpening) {
                         openProblemIds.add(questionId);
                     } else {
                         openProblemIds.delete(questionId);
-                        // 만약 질문을 다시 닫는 경우, 열려있던 정답/설명도 함께 닫습니다.
                         answer.style.display = 'none';
                         comment.style.display = 'none';
                     }
                     localStorage.setItem(openProblemsStorageKey, JSON.stringify(Array.from(openProblemIds)));
 
-                    // 질문 요소에 'open' 클래스를 토글하여 +/- 표시를 변경합니다.
                     this.classList.toggle('open', isOpening);
                 });
             });
 
+            // 5. 정답 확인 버튼 클릭 로직 (기존 로직 유지)
             checkButtons.forEach(button => {
-                 // 각 확인 버튼에 클릭 이벤트 리스너를 추가합니다.
                  button.addEventListener('click', function() {
-                     // 클릭된 버튼과 관련된 요소들을 찾습니다.
-                     const problemDiv = this.closest('.problem'); // 부모 problem div
+                     const problemDiv = this.closest('.problem');
                      const answerDiv = problemDiv.querySelector('.answer');
                      const comment = problemDiv.querySelector('.code-comment');
-
-                     // 정답과 코드 설명을 보여줍니다.
                      answerDiv.style.display = 'block';
                      comment.style.display = 'block';
-
-                     // 확인 버튼 자신은 숨깁니다.
-                     this.style.display = 'none'; // 다시 버튼 숨김 활성화
+                     this.style.display = 'none';
                  });
             });
 
-             // 가짜 pandas 객체 정의 (오류 방지 및 콘솔 경고용)
+            // 6. 진행 상황 초기화 버튼 로직
+            if (resetButton) {
+                resetButton.addEventListener('click', function() {
+                    if (confirm('정말로 모든 진행 상황(열린 문제 및 작성 답안)을 초기화하시겠습니까?')) {
+                        // 열린 문제 상태 삭제
+                        localStorage.removeItem(openProblemsStorageKey);
+
+                        // 저장된 모든 답안 삭제
+                        problemDivs.forEach(div => {
+                            const questionId = div.dataset.questionId;
+                            if (questionId) {
+                                localStorage.removeItem(answerStoragePrefix + questionId);
+                            }
+                        });
+
+                        // 페이지 새로고침하여 변경사항 반영
+                        location.reload();
+                    }
+                });
+            }
+
+             // 가짜 pandas 객체 정의 (기존 로직 유지)
              if (typeof pd === 'undefined') {
+                 // ... (기존 가짜 pandas 객체 코드) ...
                  console.warn("Pandas 라이브러리가 로드되지 않았습니다. 코드 실행은 불가능하며, 정답 확인은 코드 문자열 비교만 가능합니다.");
                  window.pd = {
                      read_csv: (url, options) => { console.log(`read_csv 호출됨: ${url}`, options); return { head: () => '가짜 데이터프레임(head)', shape: [5, 2], columns: ['col1', 'col2'], index: [0,1,2,3,4], iloc: ()=>({dtype: 'object'}), tail: ()=> '가짜 데이터프레임(tail)', select_dtypes:()=>({columns:['col1']}), isnull:()=>({sum:()=>0}), info:()=>{console.log('가짜 info 출력')}, describe:()=>'가짜 describe 출력', nunique:()=>5, unique:()=>[1,2,3,4,5], loc:()=>({head:()=>'loc 결과(head)', reset_index:()=>'loc+reset_index 결과'}), sort_values:()=>({reset_index:()=>'sort+reset_index 결과'}), str: {contains:()=>'str.contains 결과', startswith:()=>'str.startswith 결과', len:()=>({__ge__:()=>'str.len 결과'})}, isin:()=>'isin 결과', groupby:()=>({size:()=>({sort_index:()=>'groupby 결과', to_frame:()=>({rename:()=>({sort_values:()=>'groupby+rename 결과'})})}), mean:()=>'groupby mean 결과', agg:()=>'groupby agg 결과'}), drop:()=>{console.log('drop 호출됨'); return window.df; }, map:()=>'map 결과', apply:()=>'apply 결과', diff:()=>'diff 결과', rolling:()=>({mean:()=>'rolling mean 결과'}), dt: { year: { unique: ()=>[2020, 2021] }, weekday: { head: ()=>'weekday 결과' }, month: { mean: ()=>'month mean 결과' }, to_period: ()=>'to_period 결과', hour: { mean: ()=>'hour mean 결과' }, day_name: ()=>'day_name 결과' }, fillna:()=>({fillna:()=>'fillna 결과'}), pivot_table:()=>'pivot_table 결과' }; },
@@ -1778,17 +1811,11 @@ print(Ans)
                  window.df = { ...window.pd.read_csv('가짜 URL'), T: {iloc:()=>({})} }; // df.T.iloc 사용 대비
              }
 
-            // Prism.js 구문 강조 적용
-            // DOM 변경 후 또는 비동기 로드 후 적용이 필요할 수 있으므로, 약간의 지연을 둘 수 있습니다.
-            // setTimeout(() => { Prism.highlightAll(); }, 0);
-            // 또는 특정 요소만 타겟팅:
-            // document.querySelectorAll('.answer pre code').forEach((block) => {
-            //   Prism.highlightElement(block);
-            // });
-            Prism.highlightAll(); // 일반적으로 DOMContentLoaded 후에는 바로 실행해도 괜찮습니다.
+            // Prism.js 구문 강조 적용 (기존 로직 유지)
+            Prism.highlightAll();
         });
     </script>
-    <!-- Prism.js JS -->
+    <!-- Prism.js JS (기존 링크 유지) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     <!-- Python 언어 지원은 autoloader가 자동으로 처리합니다 -->
