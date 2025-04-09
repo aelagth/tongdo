@@ -1318,7 +1318,7 @@ print(Ans)
 </code></pre>
             </div>
             <p class="code-comment">
-                # NaN 제거 후, 월별 그룹화하여 컬럼 평균 계산.
+                # NaN 제거 후, 월별(`.dt.month`) 그룹화하여 컬럼 평균(`.mean()`) 계산.
             </p>
         </div>
         
@@ -1327,12 +1327,12 @@ print(Ans)
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code class="language-python">df= df.fillna(method='ffill').fillna(method='bfill')
+<pre><code class="language-python">df = df.ffill().bfill()
 print(df.head())
 </code></pre>
             </div>
             <p class="code-comment">
-                # 결측치 처리: ffill 후 bfill.
+                # 결측치 처리: 앞 값으로 채우고(`.ffill()`) 뒤 값으로 채움(`.bfill()`).
             </p>
         </div>
         
@@ -1347,7 +1347,7 @@ print(Ans)
 </code></pre>
             </div>
             <p class="code-comment">
-                # 년-월('M') 기준 그룹화 후 컬럼 평균 계산.
+                # 년-월(`.dt.to_period('M')`) 기준 그룹화 후 컬럼 평균(`.mean()`) 계산.
             </p>
         </div>
         
@@ -1361,7 +1361,7 @@ print(Ans)
 </code></pre>
             </div>
             <p class="code-comment">
-                # 'RPT' 컬럼 1차 차분.
+                # 'RPT' 컬럼 1차 차분(`.diff()`) 계산.
             </p>
         </div>
         
@@ -1375,12 +1375,12 @@ print(Ans)
 </code></pre>
             </div>
             <p class="code-comment">
-                # 'RPT', 'VAL' 컬럼 7일 이동 평균 계산.
+                # 'RPT', 'VAL' 컬럼 7일 이동 평균(`.rolling(7).mean()`) 계산.
             </p>
         </div>
         
         <div class="problem" data-question-id="q76">
-              <h2 class="question"><span class="question-number">Question 76:</span><span class="question-text">'년-월-일:시' 컬럼을 pandas에서 인식할 수 있는 datetime 형태로 변경하라.<br>서울시 제공 데이터의 경우 0시가 24시로 표현된다.</span></h2>
+              <h2 class="question"><span class="question-number">Question 76:</span><span class="question-text">서울시 미세먼지 데이터 url: 'https://raw.githubusercontent.com/Datamanim/pandas/main/seoul_pm.csv' 을 읽어들이고<br>'년-월-일:시' 컬럼을 pandas에서 인식할 수 있는 datetime 형태로 변경하라.<br>서울시 제공 데이터의 경우 0시가 24시로 표현된다.</span></h2>
               <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
               <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
@@ -1503,7 +1503,7 @@ print(Ans)
         </div>
         
         <div class="problem" data-question-id="q83">
-            <h2 class="question"><span class="question-number">Question 83:</span><span class="question-text">Indicator을 삭제하고 First Tooltip 컬럼에서 신뢰구간에 해당하는 표현을 지워라</span></h2>
+            <h2 class="question"><span class="question-number">Question 83:</span><span class="question-text">국가별 5세 이하 사망통계 자료<br>'https://raw.githubusercontent.com/Datamanim/pandas/main/under5MortalityRate.csv'를 불러오고<br>Indicator을 삭제하고 First Tooltip 컬럼에서 신뢰구간에 해당하는 표현을 지워라</span></h2>
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
@@ -1539,7 +1539,6 @@ print(Ans)
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
 <pre><code class="language-python">Ans = target.pivot(index='Location',columns='Period',values='First Tooltip')
-<pre><code>Ans = target.pivot(index='Location',columns='Period',values='First Tooltip')
 print(Ans)
 </code></pre>
             </div>
@@ -1553,7 +1552,7 @@ print(Ans)
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>Ans = df.pivot_table(index='Dim1',columns='Period',values='First Tooltip',aggfunc='mean')
+<pre><code class="language-python">Ans = df.pivot_table(index='Dim1',columns='Period',values='First Tooltip',aggfunc='mean')
 print(Ans)
 </code></pre>
             </div>
@@ -1563,11 +1562,11 @@ print(Ans)
         </div>
         
         <div class="problem" data-question-id="q87">
-            <h2 class="question"><span class="question-number">Question 87:</span><span class="question-text">데이터에서 한국 KOR 데이터만 추출하라</span></h2>
+            <h2 class="question"><span class="question-number">Question 87:</span><span class="question-text">올림픽 메달리스트 정보 데이터<br>url ='https://raw.githubusercontent.com/Datamanim/pandas/main/winter.csv'를 활용하여<br>데이터에서 한국 KOR 데이터만 추출하라</span></h2>
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>kr = df[df.Country=='KOR']
+<pre><code class="language-python">kr = df[df.Country=='KOR']
 Ans = kr
 print(Ans)
 </code></pre>
@@ -1582,7 +1581,7 @@ print(Ans)
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>Ans = kr.pivot_table(index='Year',columns='Medal',aggfunc='size').fillna(0)
+<pre><code class="language-python">Ans = kr.pivot_table(index='Year',columns='Medal',aggfunc='size').fillna(0)
 print(Ans)
 </code></pre>
             </div>
@@ -1596,7 +1595,7 @@ print(Ans)
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>Ans = df.pivot_table(index='Sport',columns='Gender',aggfunc='size')
+<pre><code class="language-python">Ans = df.pivot_table(index='Sport',columns='Gender',aggfunc='size')
 print(Ans)
 </code></pre>
             </div>
@@ -1610,21 +1609,26 @@ print(Ans)
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>Ans = df.pivot_table(index='Discipline',columns='Medal',aggfunc='size')
+<pre><code class="language-python">Ans = df.pivot_table(index='Discipline',columns='Medal',aggfunc='size')
 print(Ans)
 </code></pre>
             </div>
             <p class="code-comment">
-                # 세부 종목(Discipline)별, 메달(Medal) 개수 피벗.
+                # 세부 종목(Discipline)별, 메달(Medal)별 개수 피벗 테이블(`.pivot_table()`) 생성.
             </p>
         </div>
         
         <div class="problem" data-question-id="q91">
-            <h2 class="question"><span class="question-number">Question 91:</span><span class="question-text">df1과 df2 데이터를 하나의 데이터 프레임으로 합쳐라</span></h2>
+            <h2 class="question"><span class="question-number">Question 91:</span><span class="question-text">데이터 변형 학습용 데이터<br>url = 'https://raw.githubusercontent.com/Datamanim/pandas/main/mergeTEst.csv'의<br>첫 4개 행을 가진 df1과 나머지 행을 가진 df2의 두 부분으로 나눈뒤<br>df1과 df2 데이터를 하나의 데이터 프레임으로 합쳐라</span></h2>
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>total = pd.concat([df1,df2])
+<pre><code>df = pd.read_csv('https://raw.githubusercontent.com/Datamanim/pandas/main/mergeTEst.csv',index_col= 0)
+df1 = df.iloc[:4,:]
+df2 = df.iloc[4:,:]
+display(df1)
+display(df2)
+total = pd.concat([df1,df2])
 Ans = total
 print(Ans)
 </code></pre>
@@ -1635,11 +1639,15 @@ print(Ans)
         </div>
         
         <div class="problem" data-question-id="q92">
-            <h2 class="question"><span class="question-number">Question 92:</span><span class="question-text">df3과 df4 데이터를 하나의 데이터 프레임으로 합쳐라. 둘다 포함하고 있는 년도에 대해서만 고려한다</span></h2>
+            <h2 class="question"><span class="question-number">Question 92:</span><span class="question-text">첫 2개 행과 처음 4개 열을 포함하는 dataframe을 df3<br>여섯 번째 행부터 마지막 행과 네 번째 열부터 마지막 열까지 포함하는 dataframe을 df4로 저장한뒤<br>df3과 df4 데이터를 하나의 데이터 프레임으로 합쳐라. 둘다 포함하고 있는 년도에 대해서만 고려한다</span></h2>
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
-<pre><code>Ans = pd.concat([df3,df4],join='inner')
+<pre><code>df3 = df.iloc[:2,:4]
+df4 = df.iloc[5:,3:]
+display(df3)
+display(df4)
+Ans = pd.concat([df3,df4],join='inner')
 print(Ans)
 </code></pre>
             </div>
@@ -1663,7 +1671,7 @@ print(Ans)
         </div>
         
         <div class="problem" data-question-id="q94">
-            <h2 class="question"><span class="question-number">Question 94:</span><span class="question-text">df5과 df6 데이터를 하나의 데이터 프레임으로 merge함수를 이용하여 합쳐라. Algeria컬럼을 key로 하고 두 데이터 모두 포함하는 데이터만 출력하라</span></h2>
+            <h2 class="question"><span class="question-number">Question 94:</span><span class="question-text">전치된 dataframe에서 행 7개와 열 4개를 선택한것을 df5<br>전치된 데이터프레임에서 7번째행부터 마지막 행까지와 3번째 열부터 5번째 열까지를 df6라 할때<br>df5과 df6 데이터를 하나의 데이터 프레임으로 merge함수를 이용하여 합쳐라. Algeria컬럼을 key로 하고 두 데이터 모두 포함하는 데이터만 출력하라</span></h2>
             <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
             <button class="check-answer-btn">정답 확인</button>
             <div class="answer">
