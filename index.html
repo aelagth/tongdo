@@ -1713,23 +1713,23 @@ print(Ans)
         </div>
     </div>
 
-    <div class="problem" data-question-id="q96">
-        <h2 class="question"><span class="question-number">Question 96:</span><span class="question-text">2019년의 데이터를 Min-Max 정규화하고<br>0.5보다 큰 값을 가지는 레코드의 개수를 구하여라 </span></h2>
-        <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
-        <button class="check-answer-btn">정답 확인</button>
-        <div class="answer">
+        <div class="problem" data-question-id="q96">
+            <h2 class="question"><span class="question-number">Question 96:</span><span class="question-text">2019년의 데이터를 Min-Max 정규화하고<br>0.5보다 큰 값을 가지는 레코드의 개수를 구하여라 </span></h2>
+            <textarea class="user-input" placeholder="여기에 답안을 입력하세요..."></textarea>
+            <button class="check-answer-btn">정답 확인</button>
+            <div class="answer">
 <pre><code class="language-python">import pandas as pd
 from sklearn.preprocessing import minmax_scale
 df = pd.read_csv('https://raw.githubusercontent.com/Datamanim/pandas/main/mergeTEst.csv',index_col= 0)
 df['2019'] = minmax_scale(df['2019'])
 print(sum(df['2019'] > 0.5))
 </code></pre>
+            </div>
+            <p class="code-comment">
+                # sklearn.preprocessing에 있는 minmax_scale 활용하기
+            </p>
         </div>
-        <p class="code-comment">
-            # sklearn.preprocessing에 있는 minmax_scale 활용하기기
-        </p>
     </div>
-</div>
 
 
     <script>
