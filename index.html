@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pandas 연습 문제 풀이</title>
+    <title>통쾌한 도전 연구모임 Pandas 연습 문제 풀이</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -110,8 +110,8 @@
         .question.open::before { content: '- '; }
         .question-number { font-weight: 600; margin-right: 0.5rem; }
         .question-text { text-decoration: none; white-space: normal; overflow-wrap: break-word; word-break: break-word; display: inline-block; width: calc(100% - 25px); vertical-align: top; }
-        .user-input { width: 100%; min-height: 150px; margin-top: 0.5rem; margin-bottom: 0.5rem; padding: 0.75rem; border: 1px solid var(--input-border); border-radius: 0.375rem; font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; font-size: 0.95rem; background-color: var(--input-bg); color: var(--input-text); display: none; box-sizing: border-box; line-height: 1.5; white-space: pre; overflow-wrap: normal; overflow-x: auto; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
-        .check-answer-btn { display: none; padding: 0.5rem 1rem; background-color: #3b82f6; color: white; border: none; border-radius: 0.375rem; cursor: pointer; margin-bottom: 0.5rem; transition: background-color 0.2s; }
+        .user-input { width: 100%; min-height: 150px; margin-top: 0.5rem; margin-bottom: 0.5rem; padding: 0.75rem; border: 1px solid var(--input-border); border-radius: 0.375rem; font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; font-size: 0.95rem; background-color: var(--input-bg); color: var(--input-text); display:  block; box-sizing: border-box; line-height: 1.5; white-space: pre; overflow-wrap: normal; overflow-x: auto; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+        .check-answer-btn { display: inline-block; padding: 0.5rem 1rem; background-color: #3b82f6; color: white; border: none; border-radius: 0.375rem; cursor: pointer; margin-bottom: 0.5rem; transition: background-color 0.2s; }
         .check-answer-btn:hover { background-color: #2563eb; }
         .answer { font-size: 1rem; margin-bottom: 0.5rem; padding: 0; border-radius: 0.375rem; overflow-x: auto; display: none; border: 1px dashed var(--border-secondary); position: relative; transition: border-color 0.3s ease; }
         .code-comment { font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem; margin-top: 0.5rem; padding: 0.5rem; background-color: var(--bg-tertiary); border-left: 3px solid var(--border-primary); display: none; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
@@ -1723,12 +1723,12 @@ df = pd.read_csv('https://raw.githubusercontent.com/Datamanim/pandas/main/mergeT
 df['2019'] = minmax_scale(df['2019'])
 print(sum(df['2019'] > 0.5))
 </code></pre>
-            </div>
-            <p class="code-comment">
-                # sklearn.preprocessing에 있는 minmax_scale 활용하기
-            </p>
         </div>
+        <p class="code-comment">
+            # sklearn.preprocessing에 있는 minmax_scale 활용하기기
+        </p>
     </div>
+</div>
 
 
     <script>
@@ -1747,7 +1747,13 @@ print(sum(df['2019'] > 0.5))
             const themeToggleCheckbox = document.getElementById('theme-toggle-checkbox'); // 체크박스 선택
             const body = document.body;
             const html = document.documentElement;
-
+            
+            textInputs.forEach(textarea => {
+                textarea.style.display = 'block';
+            });
+            checkButtons.forEach(button => {
+                button.style.display = 'block';
+            });
 
             // --- 테마 설정 로직 ---
             const getCurrentTheme = () => localStorage.getItem(themeKey) || 'light'; // 기본값 light
@@ -1809,36 +1815,53 @@ print(sum(df['2019'] > 0.5))
 
 
             // 4. 질문 클릭 시 토글 로직 (기존 로직과 동일)
-            questions.forEach(question => {
-                question.addEventListener('click', function() {
-                    const problemDiv = this.closest('.problem');
-                    if (!problemDiv || !problemDiv.dataset.questionId) return;
+            //questions.forEach(question => {
+            //    question.addEventListener('click', function() {
+            //        const problemDiv = this.closest('.problem');
+            //        if (!problemDiv || !problemDiv.dataset.questionId) return;
 
-                    const questionId = problemDiv.dataset.questionId;
-                    const userInput = problemDiv.querySelector('.user-input');
-                    const checkBtn = problemDiv.querySelector('.check-answer-btn');
-                    const answer = problemDiv.querySelector('.answer');
-                    const comment = problemDiv.querySelector('.code-comment');
+            //        const questionId = problemDiv.dataset.questionId;
+            //        const userInput = problemDiv.querySelector('.user-input');
+            //        const checkBtn = problemDiv.querySelector('.check-answer-btn');
+            //        const answer = problemDiv.querySelector('.answer');
+            //        const comment = problemDiv.querySelector('.code-comment');
 
-                    if (!userInput || !checkBtn || !answer || !comment) return;
+            //        if (!userInput || !checkBtn || !answer || !comment) return;
 
-                    const isOpening = !this.classList.contains('open');
-                    userInput.style.display = isOpening ? 'block' : 'none';
-                    checkBtn.style.display = isOpening ? 'block' : 'none';
+            //        const isOpening = !this.classList.contains('open');
+            //        userInput.style.display = isOpening ? 'block' : 'none';
+            //        checkBtn.style.display = isOpening ? 'block' : 'none';
 
-                    if (isOpening) {
-                        openProblemIds.add(questionId);
-                    } else {
-                        openProblemIds.delete(questionId);
-                        answer.style.display = 'none';
+            //        if (isOpening) {
+            //            openProblemIds.add(questionId);
+            //        } else {
+            //            openProblemIds.delete(questionId);
+            //            answer.style.display = 'none';
+            //            comment.style.display = 'none';
+            //        }
+            //        localStorage.setItem(openProblemsStorageKey, JSON.stringify(Array.from(openProblemIds)));
+
+            //        this.classList.toggle('open', isOpening);
+            //    });
+            //});
+            
+            const answerDivs = document.querySelectorAll('.answer');
+            answerDivs.forEach(answer => {
+                answer.addEventListener('click', function() {
+                    this.style.display = 'none';  // 정답 영역 숨김
+                    // 같은 문제 내에 있는 코드 해설도 숨김
+                    const comment = this.parentElement.querySelector('.code-comment');
+                    if (comment) {
                         comment.style.display = 'none';
                     }
-                    localStorage.setItem(openProblemsStorageKey, JSON.stringify(Array.from(openProblemIds)));
-
-                    this.classList.toggle('open', isOpening);
+                    // 정답 확인 버튼 다시 보이게
+                    const checkBtn = this.parentElement.querySelector('.check-answer-btn');
+                    if (checkBtn) {
+                        checkBtn.style.display = 'block';
+                    }
                 });
             });
-
+            
             // 5. 정답 확인 버튼 클릭 로직 (기존 로직 유지)
             checkButtons.forEach(button => {
                  button.addEventListener('click', function() {
