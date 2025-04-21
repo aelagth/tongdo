@@ -2179,6 +2179,19 @@ print(f"조정된 결정계수 (Adjusted R-squared): {adj_r_squared:.4f}")
                     }
                 });
 
+                // 모든 섹션에 대해 초기 로드 시 입력 영역과 확인 버튼을 항상 보이도록 설정
+                textInputs.forEach(input => input.style.display = 'block');
+                // 정답이 이미 표시된 경우는 제외하고 확인 버튼 표시
+                problemDivs.forEach(problemDiv => {
+                    const answerDiv = problemDiv.querySelector('.answer');
+                    const checkBtn = problemDiv.querySelector('.check-answer-btn');
+                    if (checkBtn && (!answerDiv || answerDiv.style.display !== 'block')) {
+                         checkBtn.style.display = 'block';
+                    } else if (checkBtn) {
+                        checkBtn.style.display = 'none'; // 정답 보이면 숨김
+                    }
+                });
+
                 // 2. 저장된 사용자 답안 불러오기 및 복원
                 textInputs.forEach(textarea => {
                     const problemDiv = textarea.closest('.problem');
@@ -2211,8 +2224,11 @@ print(f"조정된 결정계수 (Adjusted R-squared): {adj_r_squared:.4f}")
                         if (!userInput || !checkBtn || !answer ) return; // Comment might not exist
 
                         const isOpening = !this.classList.contains('open');
-                        userInput.style.display = isOpening ? 'block' : 'none';
-                        checkBtn.style.display = isOpening ? 'block' : 'none';
+
+                        // 모든 섹션에서 입력 영역은 항상 block 유지
+                        userInput.style.display = 'block';
+                        // 모든 섹션에서 정답이 보이면 확인 버튼 숨김, 아니면 보임
+                        checkBtn.style.display = answer.style.display === 'block' ? 'none' : 'block';
 
                         let currentOpenIds = new Set(JSON.parse(localStorage.getItem(config.openProblems) || '[]'));
                         if (isOpening) {
@@ -2223,12 +2239,16 @@ print(f"조정된 결정계수 (Adjusted R-squared): {adj_r_squared:.4f}")
                                  if(comment) comment.style.display = 'none';
                             } else {
                                 if(comment) comment.style.display = 'block'; // Keep comment visible if answer is visible
-                                checkBtn.style.display = 'none'; // Hide check button if answer is already visible
+                                // 정답이 이미 보이면 확인 버튼 숨김 (모든 섹션 공통)
+                                checkBtn.style.display = 'none';
                             }
                         } else {
+                            // 문제 닫기
                             currentOpenIds.delete(questionId);
                             answer.style.display = 'none';
                             if(comment) comment.style.display = 'none';
+                            // 문제 닫을 때 확인 버튼 다시 보이게 (모든 섹션 공통)
+                            checkBtn.style.display = 'block';
                         }
                         localStorage.setItem(config.openProblems, JSON.stringify(Array.from(currentOpenIds)));
 
@@ -2245,12 +2265,12 @@ print(f"조정된 결정계수 (Adjusted R-squared): {adj_r_squared:.4f}")
                         if (comment) {
                             comment.style.display = 'none'; // 코드 해설 숨김
                         }
-                        // 정답 확인 버튼 다시 보이게 (해당 문제가 열려 있을 때만)
+                        // 정답 확인 버튼 다시 보이게
                         const checkBtn = problemDiv.querySelector('.check-answer-btn');
-                        const questionH2 = problemDiv.querySelector('.question');
-                         if (checkBtn && questionH2 && questionH2.classList.contains('open')) {
-                            checkBtn.style.display = 'block';
-                         }
+                        // const currentSectionKey = problemDiv.closest('.practice-section').id.split('-')[0]; // 이미 위에서 선언됨
+                        if (checkBtn) {
+                           checkBtn.style.display = 'block';
+                        }
                     });
                 });
 
@@ -2262,7 +2282,7 @@ print(f"조정된 결정계수 (Adjusted R-squared): {adj_r_squared:.4f}")
                          const comment = problemDiv.querySelector('.code-comment');
                          if (answerDiv) answerDiv.style.display = 'block';
                          if (comment) comment.style.display = 'block'; // Show comment as well
-                         this.style.display = 'none'; // Hide the button itself
+                         this.style.display = 'none'; // Hide the button itself after clicking
                      });
                 });
             }
