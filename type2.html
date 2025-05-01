@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
     <title>작업형 2번 코드</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
@@ -115,6 +115,13 @@
 <body>
 
     <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <a href="index.html" class="nav-button" style="background-color: var(--button-bg);">← 돌아가기</a>
+          <div>
+            시작 난이도: <input type="number" id="start-difficulty" value="0" min="0" max="7" style="width: 60px;">
+            <button id="apply-difficulty" class="nav-button">적용</button>
+          </div>
+        </div>
         <h1>작업형 2번 코드</h1>
         <div class="theme-toggle-container"> 다크 모드 <label class="theme-switch-label"><input type="checkbox" id="theme-toggle"><span class="slider"></span></label> </div>
         <h2 id="section-title">섹션 로딩 중...</h2>
@@ -123,7 +130,8 @@
         </div>
         <div id="controls">
             <div class="button-group">
-                <button id="difficulty-button" class="nav-button active">난이도 업 (Level 0)</button>
+                <button id="difficulty-down-button" class="nav-button">난이도 다운</button>
+                <button id="difficulty-up-button" class="nav-button">난이도 업</button>
                 <button id="reset-button" class="nav-button">초기화</button>
             </div>
             <div id="navigation-buttons">
@@ -455,6 +463,55 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
         themeToggle.addEventListener('change', (event) => setTheme(event.target.checked));
 
         // --- Initial Setup ---
+
+        const difficultyUpBtn = document.getElementById('difficulty-up-button');
+        const difficultyDownBtn = document.getElementById('difficulty-down-button');
+        const applyDifficultyBtn = document.getElementById('apply-difficulty');
+        const startDifficultyInput = document.getElementById('start-difficulty');
+        
+        applyDifficultyBtn.addEventListener('click', () => {
+            let val = parseInt(startDifficultyInput.value);
+            if (!isNaN(val) && val >= 0 && val <= maxDifficulty) {
+                difficultyLevel = val;
+                hiddenIndices.clear();
+                const totalElements = hidableElements.length;
+                const targetHiddenCount = Math.ceil(totalElements * (difficultyLevel / maxDifficulty));
+                const indices = Array.from({length: totalElements}, (_, i) => i);
+                shuffleArray(indices);
+                indices.slice(0, targetHiddenCount).forEach(idx => hiddenIndices.add(idx));
+                updateDisplay();
+                updateButtonStates();
+            }
+        });
+        
+        difficultyUpBtn.addEventListener('click', () => {
+            if (difficultyLevel >= maxDifficulty || !hidableElements.length) return;
+        
+            difficultyLevel++;
+            const totalElements = hidableElements.length;
+            const targetHiddenCount = Math.ceil(totalElements * (difficultyLevel / maxDifficulty));
+            const visibleIndices = [];
+            for (let i = 0; i < totalElements; i++) {
+                if (!hiddenIndices.has(i)) visibleIndices.push(i);
+            }
+            const numToHideNow = Math.min(targetHiddenCount - hiddenIndices.size, visibleIndices.length);
+            shuffleArray(visibleIndices);
+            visibleIndices.slice(0, numToHideNow).forEach(i => hiddenIndices.add(i));
+            updateDisplay();
+            updateButtonStates();
+        });
+        
+        difficultyDownBtn.addEventListener('click', () => {
+            if (difficultyLevel <= 0) return;
+            difficultyLevel--;
+            const totalElements = hidableElements.length;
+            const targetHiddenCount = Math.ceil(totalElements * (difficultyLevel / maxDifficulty));
+            const currentHidden = Array.from(hiddenIndices);
+            const excess = currentHidden.length - targetHiddenCount;
+            currentHidden.slice(0, excess).forEach(i => hiddenIndices.delete(i));
+            updateDisplay();
+            updateButtonStates();
+        });
         document.addEventListener('DOMContentLoaded', () => loadSection(0));
 
     </script>
