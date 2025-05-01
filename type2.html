@@ -281,7 +281,7 @@ model.fit(X_train, Y_train)
                 code: `
 # 8. 테스트에서 성능 판단 #외우기 힘들면 안 외워도 지장 없지만 점수 확인 후 제출시 필요함
 val_pred = model.predict(X_val)
-print(f"\\n[검증 결과] ({task_type.upper()})") # '검지' -> '검증'
+print(f"\\n[검증 결과] ({task_type.upper()})")
 if task_type == '분류':
     val_proba = model.predict_proba(X_val)[:, 1] if y.nunique() == 2 else None
     print("Accuracy :", accuracy_score(Y_val, val_pred))
