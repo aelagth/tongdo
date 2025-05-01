@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>작업형 2번 코드</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <style>
+        /* --- CSS Variables --- */
+        :root {
+            --bg-primary: #f3f4f6;
+            --bg-secondary: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #374151;
+            --border-primary: #d1d5db;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --button-bg: #e5e7eb;
+            --button-text: #1f2937;
+            --button-hover-bg: #d1d5db;
+            --prism-bg: #272822;
+            --toggle-bg-off: #e5e7eb;
+            --toggle-bg-on: #3b82f6;
+            --toggle-knob: #ffffff;
+            --nav-button-active-bg: #3b82f6;
+            --nav-button-active-text: #ffffff;
+            --nav-button-inactive-bg: var(--button-bg);
+            --nav-button-inactive-text: var(--button-text);
+            --nav-button-inactive-hover-bg: var(--button-hover-bg);
+            --hidden-token-bg: #4a4a4a; /* Slightly adjusted solid background */
+        }
+
+        html.dark-mode {
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-primary: #4b5563;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --button-bg: #374151;
+            --button-text: #f9fafb;
+            --button-hover-bg: #4b5563;
+            --prism-bg: #272822;
+            --toggle-bg-off: #4b5563;
+            --toggle-bg-on: #60a5fa;
+            --toggle-knob: #ffffff;
+            --nav-button-active-bg: #60a5fa;
+            --nav-button-active-text: #ffffff;
+            --nav-button-inactive-bg: var(--button-bg);
+            --nav-button-inactive-text: var(--text-secondary);
+            --nav-button-inactive-hover-bg: var(--button-hover-bg);
+            --hidden-token-bg: #555;
+        }
+
+        /* --- Base Styles --- */
+        html, body { font-family: 'Inter', sans-serif; color: var(--text-primary); transition: background-color 0.3s ease, color 0.3s ease; margin: 0; padding: 0; min-height: 100vh; background-color: var(--bg-primary); }
+        body { padding: 20px; box-sizing: border-box; }
+        .container { max-width: 900px; margin: 1rem auto; padding: 1.5rem; background-color: var(--bg-secondary); border-radius: 0.5rem; box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color); transition: background-color 0.3s ease, box-shadow 0.3s ease; }
+        h1 { text-align: center; color: var(--text-primary); margin-top: 0; margin-bottom: 1rem; transition: color 0.3s ease; }
+        #section-title { text-align: center; font-size: 1.25rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-primary); }
+
+        /* --- Code Display --- */
+        #code-container { margin-bottom: 1.5rem; border-radius: 0.5rem; overflow: hidden; }
+        pre[class*="language-"] { margin: 0 !important; padding: 1em !important; border-radius: 0.5rem; font-size: 0.95em; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; overflow-x: auto; background-color: var(--prism-bg); /* Ensure background is set */ }
+        code[class*="language-"] { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; white-space: inherit; word-wrap: inherit; display: block; /* Ensure code block behaves predictably */ }
+
+        /* --- Hidden Token Style --- */
+        /* Applied to ALL spans that should be hidden */
+        .hidden-token {
+            color: transparent !important;
+            background-color: var(--hidden-token-bg) !important;
+            border-radius: 2px;
+            user-select: none;
+            transition: background-color 0.2s ease, color 0.2s ease; /* Faster transition */
+            text-shadow: none !important;
+            box-shadow: none !important;
+            /* Ensure visibility is hidden if needed, though transparent color usually works */
+            /* visibility: hidden; */
+        }
+
+        /* --- Controls & Buttons --- */
+        #controls { text-align: center; margin-bottom: 1.5rem; }
+        .button-group { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; }
+        .nav-button { padding: 0.75rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500; font-size: 1em; transition: background-color 0.3s, color 0.3s, opacity 0.3s; text-decoration: none; display: inline-block; text-align: center; }
+        .nav-button.active { background-color: var(--nav-button-active-bg); color: var(--nav-button-active-text); }
+        .nav-button:not(.active) { background-color: var(--nav-button-inactive-bg); color: var(--nav-button-inactive-text); }
+        .nav-button:not(.active):hover:not(:disabled) { background-color: var(--nav-button-inactive-hover-bg); }
+        #reset-button { background-color: var(--button-bg); color: var(--button-text); }
+        #reset-button:hover { background-color: var(--button-hover-bg); }
+        .nav-button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #navigation-buttons { display: flex; justify-content: space-between; margin-top: 1rem; }
+        #prev-button, #next-button { width: 48%; }
+
+        /* --- Theme Toggle --- */
+        .theme-toggle-container { text-align: center; margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9em; }
+        .theme-switch-label { position: relative; display: inline-block; width: 50px; height: 26px; cursor: pointer; vertical-align: middle; margin-left: 10px; }
+        .theme-switch-label input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--toggle-bg-off); border-radius: 26px; transition: background-color 0.3s; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: var(--toggle-knob); border-radius: 50%; transition: transform 0.3s; }
+        input:checked + .slider { background-color: var(--toggle-bg-on); }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        /* --- Responsive --- */
+        @media (max-width: 640px) {
+            body { padding: 10px; }
+            .container { margin: 0.5rem auto; padding: 1rem; }
+            h1 { font-size: 1.5rem; }
+            #section-title { font-size: 1.1rem; }
+            .nav-button { padding: 0.6rem 1rem; font-size: 0.9em; }
+            pre[class*="language-"] { font-size: 0.85em; }
+            #prev-button, #next-button { width: 47%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>작업형 2번 코드</h1>
+        <div class="theme-toggle-container"> 다크 모드 <label class="theme-switch-label"><input type="checkbox" id="theme-toggle"><span class="slider"></span></label> </div>
+        <h2 id="section-title">섹션 로딩 중...</h2>
+        <div id="code-container">
+            <pre><code id="code-display" class="language-python"></code></pre>
+        </div>
+        <div id="controls">
+            <div class="button-group">
+                <button id="difficulty-button" class="nav-button active">난이도 업 (Level 0)</button>
+                <button id="reset-button" class="nav-button">초기화</button>
+            </div>
+            <div id="navigation-buttons">
+                 <button id="prev-button" class="nav-button">이전 섹션</button>
+                 <button id="next-button" class="nav-button">다음 섹션</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+    <script>
+        // --- Code Sections Definition ---
+        const codeSections = [
+             // ... (이전과 동일한 섹션 정의) ...
+            {
+                title: "1. 라이브러리 임포트",
+                code: `
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+# from xgboost import XGBClassifier, XGBRegressor
+from sklearn.metrics import (
+ accuracy_score, f1_score, recall_score, precision_score, roc_auc_score,
+ mean_squared_error, mean_absolute_error, mean_absolute_percentage_error, r2_score
+)
+import numpy as np
+                `.trim()
+            },
+            {
+                title: "2. 데이터 로드하기",
+                code: `
+# 1. 데이터 로드하기 (파일 경로는 상황에 맞게 수정)
+x_train = pd.read_csv('data/customer_train.csv')
+x_test = pd.read_csv('data/customer_test.csv')
+# y_train = pd.read_csv('y_train.csv') # y_train 파일이 존재하는 경우
+                `.trim()
+            },
+            {
+                title: "3. 설정값 정의",
+                code: `
+# 2. 설정: 회규 or 분류
+task_type = '분류' # 예측할 데이터가 수치형인 경우 '회귀', 범주형인 경우 '분류' 입력
+target_col = '성별' # 예측할 컬럼명 입력
+id_col = '회원ID' # ID 컬럼(x_train에 있는 unique한 칼럼(주로 ID칼럼) 입력)
+submission_col = 'pred' # 시험에서 주어진 예측 결과 칼럼명
+                `.trim()
+            },
+            {
+                title: "4. 타깃 변수 분리",
+                code: `
+# 3. 타깃 구분하기
+drop_cols = [id_col] if id_col else []
+# 타깃이 x_train에 포함되어 있는 경우(y_train이 없는 경우)
+y = x_train[target_col]
+X = x_train.drop(columns=drop_cols + [target_col], errors='ignore')
+# y_train이 주어진 경우(주석 해제)
+# y = y_train[target_col]
+# X = x_train.drop(columns=drop_cols, errors='ignore')
+X_test = x_test.drop(columns=drop_cols, errors='ignore')
+                `.trim()
+            },
+            {
+                title: "5. 결측치 처리 (옵션)",
+                code: `
+# 4 결측치 처리 (1가지 선택해서 주석 해제, 결측치 없으면 없어도 됨)
+# 1. 모든 결측치 0으로 채우기(빠르고 안정적이지만 점수 낮아질 가능성 존재)
+# X = X.fillna(0)
+# X_test = X_test.fillna(0)
+
+# 2. 수치형(평균값으로) + 범주형(최빈값으로) 값 처리
+# for col in X.columns:
+#     val = X[col].mean() if X[col].dtype in ['float64', 'int64'] else X[col].mode()[0]
+#     X[col] = X[col].fillna(val)
+#     X_test[col] = X_test[col].fillna(val)
+                `.trim()
+            },
+            {
+                title: "6. 범주형 인코딩 및 정렬",
+                code: `
+# 5. 범주형 컬럼 인코딩 + test 컬럼 정렬
+X = pd.get_dummies(X)
+X_test = pd.get_dummies(X_test)
+X_test = X_test.reindex(columns=X.columns, fill_value=0)
+                `.trim()
+            },
+            {
+                title: "7. 데이터 분할",
+                code: `
+# 6. 데이터 분할
+X_train, X_val, Y_train, Y_val = train_test_split(
+ X, y, test_size=0.3, # 0.2로 변경해서 수치 확인해보고 더 높은걸로 제출
+ stratify=y if task_type == '분류' and y.nunique() > 1 else None,
+ random_state=42
+)
+                `.trim()
+            },
+            {
+                title: "8. 모델 선택 및 학습",
+                code: `
+# 7. 모델 선택 및 학습
+if task_type == '분류':
+    model = RandomForestClassifier(random_state=42)
+    # model = XGBClassifier(use_label_encoder=False, eval_metric='mlogloss', random_state=42)
+else:
+    model = RandomForestRegressor(random_state=42)
+    # model = XGBRegressor(random_state=42)
+model.fit(X_train, Y_train)
+                `.trim()
+            },
+            {
+                title: "9. 검증 데이터 성능 평가",
+                code: `
+# 8. 테스트에서 성능 판단 #외우기 힘들면 안 외워도 지장 없지만 점수 확인 후 제출시 필요함
+val_pred = model.predict(X_val)
+print(f"\\n[검증 결과] ({task_type.upper()})") # '검지' -> '검증'
+if task_type == '분류':
+    val_proba = model.predict_proba(X_val)[:, 1] if y.nunique() == 2 else None
+    print("Accuracy :", accuracy_score(Y_val, val_pred))
+    print("Precision:", precision_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
+    print("Recall :", recall_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
+    print("F1 Score :", f1_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
+    if val_proba is not None:
+        print("ROC AUC :", roc_auc_score(Y_val, val_proba))
+else:
+    print("MAE :", mean_absolute_error(Y_val, val_pred))
+    print("RMSE :", np.sqrt(mean_squared_error(Y_val, val_pred)))
+    print("MAPE :", mean_absolute_percentage_error(Y_val, val_pred))
+    print("R² :", r2_score(Y_val, val_pred))
+                `.trim()
+            },
+            {
+                title: "10. 테스트셋 예측",
+                code: `
+# 9. 테스트셋별 예측(이진분류, 다중분류, 회귀)
+if task_type == '분류' and y.nunique() == 2:
+    test_pred = model.predict_proba(X_test)[:, 1]
+else:
+    test_pred = model.predict(X_test)
+                `.trim()
+            },
+            {
+                title: "11. 제출 파일 생성",
+                code: `
+# 10. 제출용 CSV 저장
+submission = pd.DataFrame({
+    submission_col: test_pred
+})
+submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 맞춰서 작성하기
+                `.trim()
+            }
+        ];
+
+        // --- DOM References ---
+        const codeDisplay = document.getElementById('code-display');
+        const sectionTitle = document.getElementById('section-title');
+        const difficultyButton = document.getElementById('difficulty-button');
+        const resetButton = document.getElementById('reset-button');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const themeToggle = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+
+        // --- State Variables ---
+        let currentSectionIndex = 0;
+        let hidableElements = []; // Renamed: Holds ALL span elements (tokens and text parts)
+        let difficultyLevel = 0;
+        const maxDifficulty = 7;
+        let hiddenIndices = new Set(); // Renamed: Indices of hidden elements in hidableElements
+
+        // --- Functions ---
+
+        // Fisher-Yates Shuffle
+        function shuffleArray(array) { /* ... (no change) ... */
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+
+        // **NEW**: Wraps text nodes and collects all spans
+        function prepareHidableElements() {
+            const childNodes = Array.from(codeDisplay.childNodes);
+            const fragment = document.createDocumentFragment(); // Use fragment for efficiency
+            hidableElements = []; // Reset the list
+
+            childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    // Wrap non-empty text nodes in a span
+                    if (node.textContent.trim().length > 0) {
+                        const span = document.createElement('span');
+                        span.className = 'text-part'; // Assign a class if needed for styling/debugging
+                        span.textContent = node.textContent;
+                        fragment.appendChild(span);
+                        hidableElements.push(span);
+                    } else {
+                        // Keep whitespace nodes as they are for structure, but don't make them hidable
+                         fragment.appendChild(node.cloneNode(true)); // Add whitespace back
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SPAN') {
+                    // Assume existing spans (like Prism's .token) are hidable
+                    fragment.appendChild(node.cloneNode(true)); // Add existing span
+                    // We need to get a reference to the *newly appended* span in the fragment
+                    hidableElements.push(fragment.lastChild);
+                } else {
+                     // Keep other nodes (like <br> if any)
+                     fragment.appendChild(node.cloneNode(true));
+                }
+            });
+
+            // Replace original content with the processed fragment
+            codeDisplay.innerHTML = ''; // Clear existing
+            codeDisplay.appendChild(fragment); // Append processed nodes
+
+             // Re-select the elements from the DOM to ensure references are correct
+             // This is crucial after replacing innerHTML or using fragments
+             hidableElements = Array.from(codeDisplay.querySelectorAll('span.token, span.text-part'));
+
+        }
+
+
+        // Load and display a specific section
+        function loadSection(index) {
+            if (index < 0 || index >= codeSections.length) return;
+            currentSectionIndex = index;
+            const section = codeSections[currentSectionIndex];
+
+            sectionTitle.textContent = section.title;
+            difficultyLevel = 0;
+            hiddenIndices.clear(); // Use renamed variable
+            hidableElements = []; // Reset
+
+            // Load code, highlight, then prepare hidable elements
+            codeDisplay.textContent = section.code;
+            Prism.highlightElement(codeDisplay);
+            prepareHidableElements(); // **NEW STEP**
+
+            updateDisplay();
+            updateButtonStates();
+        }
+
+        // Update visual state of ALL hidable elements
+        function updateDisplay() {
+            const isMaxDifficulty = difficultyLevel === maxDifficulty;
+
+            hidableElements.forEach((el, index) => {
+                if (isMaxDifficulty || hiddenIndices.has(index)) {
+                    el.classList.add('hidden-token');
+                } else {
+                    el.classList.remove('hidden-token');
+                }
+            });
+        }
+
+        // Update state of all buttons
+        function updateButtonStates() {
+            difficultyButton.textContent = `난이도 업 (Level ${difficultyLevel})`;
+            difficultyButton.disabled = (difficultyLevel >= maxDifficulty);
+            difficultyButton.classList.toggle('active', difficultyLevel < maxDifficulty); // More direct toggle
+
+            resetButton.disabled = false;
+            prevButton.disabled = (currentSectionIndex === 0);
+            nextButton.disabled = (currentSectionIndex === codeSections.length - 1);
+        }
+
+        // --- Event Listeners ---
+
+        // Difficulty Button
+        difficultyButton.addEventListener('click', () => {
+            if (difficultyLevel >= maxDifficulty || !hidableElements.length) return;
+
+            difficultyLevel++;
+
+            const totalElements = hidableElements.length;
+            const targetHiddenCount = Math.ceil(totalElements * (difficultyLevel / maxDifficulty));
+            const currentHiddenCount = hiddenIndices.size; // Use renamed variable
+            let numToHideNow = Math.max(0, targetHiddenCount - currentHiddenCount);
+
+            if (numToHideNow === 0 && currentHiddenCount < totalElements && difficultyLevel < maxDifficulty) {
+                 numToHideNow = 1;
+            }
+
+            const visibleIndices = [];
+            for (let i = 0; i < totalElements; i++) {
+                if (!hiddenIndices.has(i)) { // Use renamed variable
+                    visibleIndices.push(i);
+                }
+            }
+            numToHideNow = Math.min(numToHideNow, visibleIndices.length);
+
+            shuffleArray(visibleIndices);
+            const indicesToHide = visibleIndices.slice(0, numToHideNow);
+            indicesToHide.forEach(index => hiddenIndices.add(index)); // Use renamed variable
+
+            updateButtonStates();
+            updateDisplay();
+        });
+
+        // Reset Button
+        resetButton.addEventListener('click', () => {
+            difficultyLevel = 0;
+            hiddenIndices.clear(); // Use renamed variable
+            updateDisplay();
+            updateButtonStates();
+        });
+
+        // Previous Section Button
+        prevButton.addEventListener('click', () => {
+            if (currentSectionIndex > 0) loadSection(currentSectionIndex - 1);
+        });
+
+        // Next Section Button
+        nextButton.addEventListener('click', () => {
+            if (currentSectionIndex < codeSections.length - 1) loadSection(currentSectionIndex + 1);
+        });
+
+        // --- Theme Toggle Logic ---
+        function setTheme(isDarkMode) { /* ... (no change) ... */
+            htmlElement.classList.toggle('dark-mode', isDarkMode);
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        }
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initialDarkMode = savedTheme === 'dark' || (!savedTheme && prefersDark);
+        themeToggle.checked = initialDarkMode;
+        setTheme(initialDarkMode);
+        themeToggle.addEventListener('change', (event) => setTheme(event.target.checked));
+
+        // --- Initial Setup ---
+        document.addEventListener('DOMContentLoaded', () => loadSection(0));
+
+    </script>
+
+</body>
+</html>
