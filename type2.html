@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>작업형 2번 코드</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
@@ -53,7 +53,16 @@
         }
 
         /* --- Base Styles --- */
-        html, body { font-family: 'Inter', sans-serif; color: var(--text-primary); transition: background-color 0.3s ease, color 0.3s ease; margin: 0; padding: 0; min-height: 100vh; background-color: var(--bg-primary); }
+        html, body {
+             font-family: 'Inter', sans-serif;
+             color: var(--text-primary);
+             transition: background-color 0.3s ease, color 0.3s ease;
+             margin: 0;
+             padding: 0;
+             min-height: 100vh;
+             background-color: var(--bg-primary);
+             touch-action: manipulation; /* 더블 탭 줌 방지 */
+        }
         body { padding: 20px; box-sizing: border-box; }
         .container { max-width: 900px; margin: 1rem auto; padding: 1.5rem; background-color: var(--bg-secondary); border-radius: 0.5rem; box-shadow: 0 4px 6px -1px var(--shadow-color), 0 2px 4px -2px var(--shadow-color); transition: background-color 0.3s ease, box-shadow 0.3s ease; }
         h1 { text-align: center; color: var(--text-primary); margin-top: 0; margin-bottom: 1rem; transition: color 0.3s ease; }
@@ -67,37 +76,24 @@
         /* --- Hidden Token Style --- */
         /* Applied to ALL spans that should be hidden */
         .hidden-token {
-            color: transparent !important;
+            /* color: transparent !important; */ /* color 대신 visibility 사용 */
+            visibility: hidden; /* 요소를 숨기지만 공간은 유지 */
             background-color: var(--hidden-token-bg) !important;
             border-radius: 2px;
             user-select: none !important;
             pointer-events: none !important;
-            transition: background-color 0.2s ease !important;
+            /* transition 제거 또는 visibility로 변경 (필요시) */
+            /* text-shadow, box-shadow, border 제거는 유지 */
             text-shadow: none !important;
             box-shadow: none !important;
             border: none !important;
-            padding: 0.1em 0.3em !important;
-            display: inline-block !important;
-            min-width: 0.5em !important;
+            /* 크기 고정 관련 스타일 제거 또는 조정 */
+            /* padding: 0.1em 0.3em !important; */
+            /* display: inline-block !important; */ /* visibility:hidden 이 공간 유지하므로 제거 시도 */
+            /* min-width: 0.5em !important; */
+            /* vertical-align: baseline; */ /* 필요시 추가 */
         }
         
-        /* 코드 전체를 가릴 때 사용할 스타일 */
-        .full-hidden-code {
-            position: relative;
-        }
-        
-        .full-hidden-code::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--hidden-token-bg);
-            z-index: 10;
-            border-radius: 0.5rem;
-        }
-
         /* --- Controls & Buttons --- */
         #controls { text-align: center; margin-bottom: 1.5rem; }
         .button-group { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; }
@@ -365,15 +361,50 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 }
             }
 
-            // 코드 요소 수집 함수 (그룹화 함수 호출 부활)
+            // 코드 요소 수집 함수 (모든 유효 노드 포함하도록 수정)
             function prepareHidableElements() {
-                const allSpans = Array.from(codeDisplay.querySelectorAll('span.token'));
-                hidableElements = allSpans.filter(span => {
-                    const text = span.textContent;
-                    return text && !/^[\s\n]+$/.test(text); // 공백 제외 유효 토큰만
+                // --- DOM 변경 방식 (더 안정적) ---
+                // 1. 유효 텍스트 노드를 찾아 span으로 교체
+                const walker = document.createTreeWalker(codeDisplay, NodeFilter.SHOW_TEXT, null, false);
+                let node;
+                const nodesToReplace = [];
+                while(node = walker.nextNode()) {
+                    // codeDisplay 직계 자식 또는 자식 요소 내 텍스트 노드 중 유효한 것
+                    if (node.textContent && !/^[\s\n]+$/.test(node.textContent)) {
+                         // 부모가 codeDisplay이거나, 부모가 codeDisplay의 자식 요소인 경우만 처리
+                         // (너무 깊은 노드나 다른 요소 안의 텍스트는 제외 - 필요시 조정)
+                         if (node.parentNode === codeDisplay || node.parentNode.parentNode === codeDisplay) {
+                             const span = document.createElement('span');
+                             span.className = 'token text-node-token'; // 식별용 클래스
+                             span.textContent = node.textContent;
+                             nodesToReplace.push({ oldNode: node, newNode: span });
+                         }
+                    }
+                }
+                nodesToReplace.forEach(pair => {
+                    try {
+                        // parentNode가 null이 아닌지 확인 후 교체
+                        if (pair.oldNode.parentNode) {
+                            pair.oldNode.parentNode.replaceChild(pair.newNode, pair.oldNode);
+                        } else {
+                             console.warn("교체하려는 노드의 부모가 없습니다:", pair.oldNode);
+                        }
+                    } catch (e) {
+                        console.error("텍스트 노드 교체 중 오류:", e, pair.oldNode);
+                    }
                 });
-                console.log(`숨길 수 있는 총 토큰 수: ${hidableElements.length}개`);
-                groupTokensIntoWords(); // 그룹화 함수 호출
+
+                // 2. 이제 모든 유효 코드는 span.token 또는 span.text-node-token 안에 있음
+                const allTokenSpans = Array.from(codeDisplay.querySelectorAll('span.token'));
+                hidableElements = allTokenSpans.filter(span => {
+                    const text = span.textContent;
+                    // 비어있거나 공백만 있는 자동생성 span 제외 (필요시 추가 필터링)
+                    return text && !/^[\s\n]+$/.test(text);
+                });
+                // --- DOM 변경 방식 끝 ---
+
+                console.log(`숨길 수 있는 총 요소(수정 후): ${hidableElements.length}개`);
+                groupTokensIntoWords(); // 그룹화 함수는 hidableElements 기반으로 동작하므로 유지
             }
 
             // 토큰 그룹화 함수 (사용자 규칙 기반 재작성 v2)
@@ -477,17 +508,10 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
             // 디스플레이 업데이트
             function updateDisplay() {
                 console.log(`화면 업데이트: 난이도=${difficultyLevel}, 숨겨진 토큰=${hiddenIndices.size}/${hidableElements.length}`);
-                
-                // 난이도 7(최대 난이도)일 때만 전체 코드 가리기
-                if (difficultyLevel >= maxDifficulty) {
-                    document.getElementById('code-container').classList.add('full-hidden-code');
-                } else {
-                    document.getElementById('code-container').classList.remove('full-hidden-code');
-                }
-                
-                // 선택된 토큰 가리기 (hiddenIndices 사용)
+
+                // 항상 hiddenIndices 기준으로 .hidden-token 클래스 적용
                 hidableElements.forEach((el, index) => {
-                    if (difficultyLevel >= maxDifficulty || hiddenIndices.has(index)) {
+                    if (hiddenIndices.has(index)) { // difficultyLevel >= maxDifficulty 조건 제거
                         el.classList.add('hidden-token');
                     } else {
                         el.classList.remove('hidden-token');
