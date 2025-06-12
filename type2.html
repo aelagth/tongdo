@@ -69,8 +69,14 @@
         #section-title { text-align: center; font-size: 1.25rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-primary); }
 
         /* --- Code Display --- */
-        #code-container { margin-bottom: 1.5rem; border-radius: 0.5rem; overflow: hidden; }
-        pre[class*="language-"] { margin: 0 !important; padding: 1em !important; border-radius: 0.5rem; font-size: 0.95em; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; overflow-x: auto; background-color: var(--prism-bg); /* Ensure background is set */ }
+        #code-container {
+            /* margin-bottom: 1.5rem; */ /* This margin is now on #code-interaction-wrapper */
+            border-radius: 0.5rem;
+            overflow: hidden;
+            flex: 1; /* Occupy 1 part of flex space */
+            display: flex; /* To allow child <pre> to grow */
+        }
+        pre[class*="language-"] { margin: 0 !important; padding: 1em !important; border-radius: 0.5rem; font-size: 0.95em; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; overflow-x: auto; background-color: var(--prism-bg); flex-grow: 1; min-height: 350px; /* Ensure background is set, pre grows and has min height */ }
         code[class*="language-"] { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; white-space: inherit; word-wrap: inherit; display: block; /* Ensure code block behaves predictably */ }
 
         /* --- Hidden Token Style --- */
@@ -119,8 +125,13 @@
             text-align: center;
             margin-left: 10px;
         }
+        #difficulty-max-display {
+            margin-left: 5px; /* Space after the input */
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
         #apply-difficulty {
-            margin-left: 5px;
+            margin-left: 10px; /* Adjusted space after the max display */
             padding: 0.5rem 0.75rem;
         }
 
@@ -132,6 +143,79 @@
         .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: var(--toggle-knob); border-radius: 50%; transition: transform 0.3s; }
         input:checked + .slider { background-color: var(--toggle-bg-on); }
         input:checked + .slider:before { transform: translateX(24px); }
+
+        /* --- Code Interaction Layout --- */
+        #code-interaction-wrapper {
+            display: flex;
+            flex-direction: row; /* Explicitly set, though default */
+            gap: 15px; /* Space between left and right panels */
+            margin-bottom: 1.5rem; /* Overall margin below the component */
+        }
+
+        #typing-area-container {
+            flex: 1; /* Occupy 1 part of flex space */
+            display: flex; /* To allow textarea to fill */
+            position: relative; /* For positioning the pre element */
+        }
+
+        #user-code-input {
+            width: 100%;
+            min-height: 350px; /* Same min-height as the code display <pre> */
+            box-sizing: border-box;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            font-size: 0.95em; /* Match code display */
+            line-height: 1.5; /* Match code display */
+            
+            /* Make textarea text and background transparent */
+            color: transparent;
+            background-color: transparent;
+            caret-color: #f8f8f2; /* Visible caret color, assuming dark theme */
+            
+            border: 1px solid var(--border-primary);
+            border-radius: 0.5rem; /* Match code display */
+            padding: 1em; /* Match code display */
+            resize: vertical; /* Allow user to resize vertically */
+            
+            position: relative; /* Ensure textarea is on top for input */
+            z-index: 1;
+            white-space: pre-wrap; /* Ensure textarea respects whitespace like pre */
+            word-wrap: break-word; /* Ensure textarea respects word wrap like pre */
+            overflow-x: auto; /* Match pre's overflow */
+        }
+        html.dark-mode #user-code-input {
+            caret-color: #f8f8f2;
+        }
+        html:not(.dark-mode) #user-code-input {
+            caret-color: var(--text-primary); /* Caret color for light mode */
+        }
+
+
+        #highlighting-pre {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            margin: 0 !important; 
+            padding: 1em !important; /* Must match textarea padding */
+            border-radius: 0.5rem; /* Match textarea */
+            font-size: 0.95em; /* Match textarea */
+            line-height: 1.5; /* Match textarea */
+            white-space: pre-wrap; /* Crucial for alignment */
+            word-wrap: break-word; /* Crucial for alignment */
+            overflow: auto; /* Should match textarea's overflow behavior */
+            background-color: var(--prism-bg); /* Background for highlighted code */
+            z-index: 0; /* Behind the textarea */
+            pointer-events: none; /* So it doesn't interfere with textarea clicks/scroll */
+            border: 1px solid transparent; /* To align with textarea border */
+        }
+
+        #highlighting-pre code {
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; /* Match textarea */
+            display: block;
+        }
+
 
         /* --- Responsive --- */
         @media (max-width: 640px) {
@@ -152,14 +236,21 @@
           <a href="index.html" class="nav-button" style="background-color: var(--button-bg);">← 돌아가기</a>
           <div class="difficulty-selector">
             시작 난이도: <input type="number" id="start-difficulty" value="0" min="0" max="7" style="width: 60px;">
+            <span id="difficulty-max-display">/ 7</span>
             <button id="apply-difficulty" class="nav-button">적용</button>
           </div>
         </div>
         <h1>작업형 2번 코드</h1>
         <div class="theme-toggle-container"> 다크 모드 <label class="theme-switch-label"><input type="checkbox" id="theme-toggle"><span class="slider"></span></label> </div>
         <h2 id="section-title">섹션 로딩 중...</h2>
-        <div id="code-container">
-            <pre><code id="code-display" class="language-python"></code></pre>
+        <div id="code-interaction-wrapper">
+            <div id="code-container">
+                <pre><code id="code-display" class="language-python"></code></pre>
+            </div>
+            <div id="typing-area-container">
+                <textarea id="user-code-input" placeholder="여기서 코드를 연습하세요" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+                <pre id="highlighting-pre" aria-hidden="true"><code id="highlighting-code" class="language-python"></code></pre>
+            </div>
         </div>
         <div id="controls">
             <div class="button-group">
@@ -334,6 +425,10 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
             const difficultyDownBtn = document.getElementById('difficulty-down-button');
             const applyDifficultyBtn = document.getElementById('apply-difficulty');
             const startDifficultyInput = document.getElementById('start-difficulty');
+            const userCodeInput = document.getElementById('user-code-input');
+            const highlightingCode = document.getElementById('highlighting-code');
+            const highlightingPre = document.getElementById('highlighting-pre');
+
 
             // --- State Variables ---
             let currentSectionIndex = 0;
@@ -344,6 +439,7 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
             let hiddenIndices = new Set(); // 숨겨질 개별 토큰의 인덱스 (계산용)
             let hiddenGroupIndices = new Set(); // 숨겨질 그룹의 인덱스
             let defaultDifficultyLevel = 0; // 저장된 기본 난이도
+            let typedCodePerSection = {}; // To store typed code for each section
             
             // 저장된 기본 난이도 불러오기
             if (localStorage.getItem('defaultDifficulty')) {
@@ -474,10 +570,11 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 }
             }
 
-            // 섹션 로드 함수
-            function loadSection(index) {
-                if (index < 0 || index >= codeSections.length) return;
-                currentSectionIndex = index;
+            // Internal function to handle the core logic of loading a section's display
+            function _loadSectionInternal(newIndexToShow) {
+                if (newIndexToShow < 0 || newIndexToShow >= codeSections.length) return;
+                
+                currentSectionIndex = newIndexToShow; // Update the global currentSectionIndex
                 const section = codeSections[currentSectionIndex];
 
                 sectionTitle.textContent = section.title;
@@ -486,7 +583,7 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 hiddenGroupIndices.clear();
                 hidableElements = [];
 
-                // 코드를 로드하고 Prism으로 하이라이트
+                // 코드를 로드하고 Prism으로 하이라이트 (left pane)
                 codeDisplay.textContent = section.code;
                 
                 // Prism이 토큰을 생성할 수 있도록 시간을 줌
@@ -498,12 +595,32 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                         prepareHidableElements();
                         // 난이도에 맞게 요소 숨기기
                         applyDifficultyLevel();
-                        updateDisplay();
+                        updateDisplay(); // Updates left pane hidden tokens
                         updateButtonStates();
-                        console.log("섹션이 로드되고 하이라이트되었습니다");
+                        console.log(`섹션 ${currentSectionIndex} 로드되고 하이라이트되었습니다`);
                     });
                 });
             }
+
+            // Public function to load a section, handling persistence of typed code
+            function loadSection(newIndexToLoad) {
+                // Save the currently typed code for the *outgoing* section before changing currentSectionIndex
+                // Ensure userCodeInput exists and currentSectionIndex is a number (it is after first load)
+                if (userCodeInput && typeof currentSectionIndex === 'number') {
+                    typedCodePerSection[currentSectionIndex] = userCodeInput.value;
+                    console.log(`Saved typed code for section ${currentSectionIndex}:`, userCodeInput.value.substring(0,50) + "...");
+                }
+
+                _loadSectionInternal(newIndexToLoad); // This updates currentSectionIndex to newIndexToLoad
+
+                // Restore typed code for the *newly loaded* section
+                if (userCodeInput) {
+                    userCodeInput.value = typedCodePerSection[currentSectionIndex] || "";
+                    console.log(`Restored typed code for section ${currentSectionIndex}:`, userCodeInput.value.substring(0,50) + "...");
+                    updateHighlighting(); // Update syntax highlighting for the restored code
+                }
+            }
+
 
             // 디스플레이 업데이트
             function updateDisplay() {
@@ -721,6 +838,50 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
             
             // 초기 섹션 로드 - 기본 난이도 적용
             loadSection(0);
+
+            // --- Syntax Highlighting for Typing Area ---
+            function syncScroll() {
+                highlightingPre.scrollTop = userCodeInput.scrollTop;
+                highlightingPre.scrollLeft = userCodeInput.scrollLeft;
+            }
+
+            function updateHighlighting() {
+                const code = userCodeInput.value;
+                // Append a newline if the code ends with a newline.
+                // This helps Prism.js to correctly highlight the last line if it's being edited.
+                // Also handles empty input correctly.
+                highlightingCode.textContent = code + (code.endsWith('\\n') ? '\\n' : ''); 
+                Prism.highlightElement(highlightingCode);
+                syncScroll(); // Ensure scroll is synced after content change
+            }
+
+            userCodeInput.addEventListener('input', updateHighlighting);
+            userCodeInput.addEventListener('scroll', syncScroll);
+            
+            // Initial highlight if there's any pre-filled text (e.g. from browser cache)
+            // updateHighlighting(); // This is now called within the new loadSection
+
+            // The old wrapper for loadSection is removed as its logic is now in the new loadSection.
+            
+            userCodeInput.addEventListener('input', () => {
+                updateHighlighting();
+                // Continuously save as user types for the current section
+                if (typeof currentSectionIndex === 'number') {
+                    typedCodePerSection[currentSectionIndex] = userCodeInput.value;
+                }
+            });
+            userCodeInput.addEventListener('scroll', syncScroll);
+            
+            // Ensure highlighting is updated if theme changes (mainly for caret color)
+            const originalSetTheme = setTheme;
+            setTheme = (isDarkMode) => {
+                originalSetTheme(isDarkMode);
+                // Force redraw of caret, not strictly necessary for highlighting but good practice
+                const currentVal = userCodeInput.value;
+                userCodeInput.value = ''; 
+                userCodeInput.value = currentVal;
+            };
+
         });
     </script>
 
