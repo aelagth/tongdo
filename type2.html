@@ -80,24 +80,15 @@
         code[class*="language-"] { font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; white-space: inherit; word-wrap: inherit; display: block; /* Ensure code block behaves predictably */ }
 
         /* --- Hidden Token Style --- */
-        /* Applied to ALL spans that should be hidden */
         .hidden-token {
-            /* color: transparent !important; */ /* color 대신 visibility 사용 */
-            visibility: hidden; /* 요소를 숨기지만 공간은 유지 */
+            visibility: hidden;
             background-color: var(--hidden-token-bg) !important;
             border-radius: 2px;
             user-select: none !important;
             pointer-events: none !important;
-            /* transition 제거 또는 visibility로 변경 (필요시) */
-            /* text-shadow, box-shadow, border 제거는 유지 */
             text-shadow: none !important;
             box-shadow: none !important;
             border: none !important;
-            /* 크기 고정 관련 스타일 제거 또는 조정 */
-            /* padding: 0.1em 0.3em !important; */
-            /* display: inline-block !important; */ /* visibility:hidden 이 공간 유지하므로 제거 시도 */
-            /* min-width: 0.5em !important; */
-            /* vertical-align: baseline; */ /* 필요시 추가 */
         }
         
         /* --- Controls & Buttons --- */
@@ -166,29 +157,27 @@
             font-size: 0.95em; /* Match code display */
             line-height: 1.5; /* Match code display */
             
-            /* Make textarea text and background transparent */
             color: transparent;
             background-color: transparent;
-            caret-color: #f8f8f2; /* Visible caret color, assuming dark theme */
+            caret-color: #f8f8f2; 
             
             border: 1px solid var(--border-primary);
             border-radius: 0.5rem; /* Match code display */
             padding: 1em; /* Match code display */
-            resize: vertical; /* Allow user to resize vertically */
+            resize: vertical; 
             
-            position: relative; /* Ensure textarea is on top for input */
+            position: relative; 
             z-index: 1;
-            white-space: pre-wrap; /* Ensure textarea respects whitespace like pre */
-            word-wrap: break-word; /* Ensure textarea respects word wrap like pre */
-            overflow-x: auto; /* Match pre's overflow */
+            white-space: pre-wrap; 
+            word-wrap: break-word; 
+            overflow-x: auto; 
         }
         html.dark-mode #user-code-input {
             caret-color: #f8f8f2;
         }
         html:not(.dark-mode) #user-code-input {
-            caret-color: var(--text-primary); /* Caret color for light mode */
+            caret-color: var(--text-primary); 
         }
-
 
         #highlighting-pre {
             position: absolute;
@@ -198,24 +187,31 @@
             height: 100%;
             box-sizing: border-box;
             margin: 0 !important; 
-            padding: 1em !important; /* Must match textarea padding */
-            border-radius: 0.5rem; /* Match textarea */
-            font-size: 0.95em; /* Match textarea */
-            line-height: 1.5; /* Match textarea */
-            white-space: pre-wrap; /* Crucial for alignment */
-            word-wrap: break-word; /* Crucial for alignment */
-            overflow: auto; /* Should match textarea's overflow behavior */
-            background-color: var(--prism-bg); /* Background for highlighted code */
-            z-index: 0; /* Behind the textarea */
-            pointer-events: none; /* So it doesn't interfere with textarea clicks/scroll */
-            border: 1px solid transparent; /* To align with textarea border */
+            padding: 1em !important; 
+            border-radius: 0.5rem; 
+            font-size: 0.95em; 
+            line-height: 1.5; 
+            white-space: pre-wrap; 
+            word-wrap: break-word; 
+            overflow: auto; 
+            background-color: var(--prism-bg); 
+            z-index: 0; 
+            pointer-events: none; 
+            border: 1px solid transparent; 
         }
 
         #highlighting-pre code {
-            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; /* Match textarea */
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; 
             display: block;
         }
 
+        /* Mobile View Toggle Button Style */
+        #mobile-view-toggle {
+            display: none; /* Hidden by default, shown on mobile via JS/CSS */
+            width: 100%;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
 
         /* --- Responsive --- */
         @media (max-width: 640px) {
@@ -226,6 +222,20 @@
             .nav-button { padding: 0.6rem 1rem; font-size: 0.9em; }
             pre[class*="language-"] { font-size: 0.85em; }
             #prev-button, #next-button { width: 47%; }
+
+            /* Mobile-specific layout changes */
+            #mobile-view-toggle {
+                /* display: block; is handled by JS, but can be here for initial paint */
+            }
+
+            #code-container,
+            #typing-area-container {
+                width: 100% !important; /* Force full width on mobile when visible */
+                flex: none !important; /* Override desktop flex behavior */
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            /* #code-interaction-wrapper gap will not apply if only one child is visible */
         }
     </style>
 </head>
@@ -243,6 +253,10 @@
         <h1>작업형 2번 코드</h1>
         <div class="theme-toggle-container"> 다크 모드 <label class="theme-switch-label"><input type="checkbox" id="theme-toggle"><span class="slider"></span></label> </div>
         <h2 id="section-title">섹션 로딩 중...</h2>
+        
+        <!-- NEW BUTTON FOR MOBILE VIEW TOGGLE -->
+        <button id="mobile-view-toggle" class="nav-button">연습하기</button>
+
         <div id="code-interaction-wrapper">
             <div id="code-container">
                 <pre><code id="code-display" class="language-python"></code></pre>
@@ -271,7 +285,6 @@
     <script>
         // --- Code Sections Definition ---
         const codeSections = [
-             // ... (이전과 동일한 섹션 정의) ...
             {
                 title: "1. 라이브러리 임포트",
                 code: `
@@ -372,20 +385,20 @@ model.fit(X_train, Y_train)
                 code: `
 # 8. 테스트에서 성능 판단 #외우기 힘들면 안 외워도 지장 없지만 점수 확인 후 제출시 필요함
 val_pred = model.predict(X_val)
-print(f"\\n[검증 결과] ({task_type.upper()})")
+console.log(f"\\n[검증 결과] ({task_type.toUpperCase()})")
 if task_type == '분류':
     val_proba = model.predict_proba(X_val)[:, 1] if y.nunique() == 2 else None
-    print("Accuracy :", accuracy_score(Y_val, val_pred))
-    print("Precision:", precision_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
-    print("Recall :", recall_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
-    print("F1 Score :", f1_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
+    console.log("Accuracy :", accuracy_score(Y_val, val_pred))
+    console.log("Precision:", precision_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
+    console.log("Recall :", recall_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
+    console.log("F1 Score :", f1_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
     if val_proba is not None:
-        print("ROC AUC :", roc_auc_score(Y_val, val_proba))
+        console.log("ROC AUC :", roc_auc_score(Y_val, val_proba))
 else:
-    print("MAE :", mean_absolute_error(Y_val, val_pred))
-    print("RMSE :", np.sqrt(mean_squared_error(Y_val, val_pred)))
-    print("MAPE :", mean_absolute_percentage_error(Y_val, val_pred))
-    print("R² :", r2_score(Y_val, val_pred))
+    console.log("MAE :", mean_absolute_error(Y_val, val_pred))
+    console.log("RMSE :", np.sqrt(mean_squared_error(Y_val, val_pred)))
+    console.log("MAPE :", mean_absolute_percentage_error(Y_val, val_pred))
+    console.log("R² :", r2_score(Y_val, val_pred))
                 `.trim()
             },
             {
@@ -432,24 +445,21 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
 
             // --- State Variables ---
             let currentSectionIndex = 0;
-            let hidableElements = []; // 숨길 수 있는 모든 개별 토큰(DOM 요소) 리스트
-            let tokenGroups = []; // 최종 그룹 (hidableElements 기준 인덱스 저장)
+            let hidableElements = []; 
+            let tokenGroups = []; 
             let difficultyLevel = 0;
             const maxDifficulty = 7;
-            let hiddenIndices = new Set(); // 숨겨질 개별 토큰의 인덱스 (계산용)
-            let hiddenGroupIndices = new Set(); // 숨겨질 그룹의 인덱스
-            let defaultDifficultyLevel = 0; // 저장된 기본 난이도
-            let typedCodePerSection = {}; // To store typed code for each section
+            let hiddenIndices = new Set(); 
+            let hiddenGroupIndices = new Set(); 
+            let defaultDifficultyLevel = 0; 
+            let typedCodePerSection = {}; 
             
-            // 저장된 기본 난이도 불러오기
             if (localStorage.getItem('defaultDifficulty')) {
                 defaultDifficultyLevel = parseInt(localStorage.getItem('defaultDifficulty'));
                 startDifficultyInput.value = defaultDifficultyLevel;
             }
 
             // --- Functions ---
-
-            // Fisher-Yates Shuffle
             function shuffleArray(array) {
                 for (let i = array.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
@@ -457,21 +467,15 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 }
             }
 
-            // 코드 요소 수집 함수 (모든 유효 노드 포함하도록 수정)
             function prepareHidableElements() {
-                // --- DOM 변경 방식 (더 안정적) ---
-                // 1. 유효 텍스트 노드를 찾아 span으로 교체
                 const walker = document.createTreeWalker(codeDisplay, NodeFilter.SHOW_TEXT, null, false);
                 let node;
                 const nodesToReplace = [];
                 while(node = walker.nextNode()) {
-                    // codeDisplay 직계 자식 또는 자식 요소 내 텍스트 노드 중 유효한 것
                     if (node.textContent && !/^[\s\n]+$/.test(node.textContent)) {
-                         // 부모가 codeDisplay이거나, 부모가 codeDisplay의 자식 요소인 경우만 처리
-                         // (너무 깊은 노드나 다른 요소 안의 텍스트는 제외 - 필요시 조정)
                          if (node.parentNode === codeDisplay || node.parentNode.parentNode === codeDisplay) {
                              const span = document.createElement('span');
-                             span.className = 'token text-node-token'; // 식별용 클래스
+                             span.className = 'token text-node-token'; 
                              span.textContent = node.textContent;
                              nodesToReplace.push({ oldNode: node, newNode: span });
                          }
@@ -479,7 +483,6 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 }
                 nodesToReplace.forEach(pair => {
                     try {
-                        // parentNode가 null이 아닌지 확인 후 교체
                         if (pair.oldNode.parentNode) {
                             pair.oldNode.parentNode.replaceChild(pair.newNode, pair.oldNode);
                         } else {
@@ -490,33 +493,26 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                     }
                 });
 
-                // 2. 이제 모든 유효 코드는 span.token 또는 span.text-node-token 안에 있음
                 const allTokenSpans = Array.from(codeDisplay.querySelectorAll('span.token'));
                 hidableElements = allTokenSpans.filter(span => {
                     const text = span.textContent;
-                    // 비어있거나 공백만 있는 자동생성 span 제외 (필요시 추가 필터링)
                     return text && !/^[\s\n]+$/.test(text);
                 });
-                // --- DOM 변경 방식 끝 ---
-
                 console.log(`숨길 수 있는 총 요소(수정 후): ${hidableElements.length}개`);
-                groupTokensIntoWords(); // 그룹화 함수는 hidableElements 기반으로 동작하므로 유지
+                groupTokensIntoWords(); 
             }
 
-            // 토큰 그룹화 함수 (사용자 규칙 기반 재작성 v2)
             function groupTokensIntoWords() {
-                const tokenData = []; // hidableElements의 정보만 저장
+                const tokenData = []; 
                 hidableElements.forEach((el, index) => {
                     const text = el.textContent;
                     tokenData.push({
                         el: el,
-                        hIndex: index, // hidableElements 기준 인덱스
+                        hIndex: index, 
                         text: text,
-                        // 타입 분류: identifier, punctuation, operator, keyword, other
                         type: el.classList.contains('keyword') ? 'keyword' :
                               el.classList.contains('punctuation') ? 'punctuation' :
                               el.classList.contains('operator') ? 'operator' :
-                              // 함수 클래스도 식별자로 간주, _ 포함 식별자 처리
                               (el.classList.contains('function') || /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(text)) ? 'identifier' :
                               'other'
                     });
@@ -527,108 +523,84 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                     return;
                 }
 
-                let finalGroups = []; // 최종 그룹 리스트 [[hIndex1, hIndex2], [hIndex3], ...]
+                let finalGroups = []; 
                 if (tokenData.length > 0) {
-                    // 첫 번째 토큰은 항상 새 그룹 시작
                     finalGroups.push([tokenData[0].hIndex]);
                 }
 
                 for (let i = 1; i < tokenData.length; i++) {
                     const currentToken = tokenData[i];
                     const prevToken = tokenData[i - 1];
-                    const lastGroup = finalGroups[finalGroups.length - 1]; // 마지막으로 추가된 그룹 참조
+                    const lastGroup = finalGroups[finalGroups.length - 1]; 
 
-                    // 병합 조건 확인 (현재 토큰이 특정 기호이고, 이전 토큰이 단어(식별자/other)인 경우)
                     const shouldMerge =
-                        // 1. '.' 이고 이전이 단어
                         (currentToken.text === '.' && (prevToken.type === 'identifier' || prevToken.type === 'other')) ||
-                        // 2. ',' 이고 이전이 단어 또는 닫는 괄호/대괄호
                         (currentToken.text === ',' && (prevToken.type === 'identifier' || prevToken.type === 'other' || prevToken.text === ')' || prevToken.text === ']')) ||
-                        // 3. '=' 이고 이전이 단어
                         (currentToken.text === '=' && currentToken.type === 'operator' && (prevToken.type === 'identifier' || prevToken.type === 'other')) ||
-                        // 4. '(' 또는 '[' 이고 이전이 단어
                         ((currentToken.text === '(' || currentToken.text === '[') && (prevToken.type === 'identifier' || prevToken.type === 'other'));
 
                     if (shouldMerge && lastGroup) {
-                        // 병합 조건 만족 시, 현재 토큰 인덱스를 마지막 그룹에 추가
                         lastGroup.push(currentToken.hIndex);
                     } else {
-                        // 병합 조건 불만족 시, 새 그룹 시작
                         finalGroups.push([currentToken.hIndex]);
                     }
                 }
-
-                // _(언더스코어)는 별도 처리 불필요 (PrismJS가 identifier로 묶어줌)
-
-                tokenGroups = finalGroups.filter(group => group && group.length > 0); // 유효 그룹만 저장
+                tokenGroups = finalGroups.filter(group => group && group.length > 0); 
                 console.log(`${tokenGroups.length}개의 최종 그룹(병합 후 v4) 생성됨.`);
                 if (tokenGroups.length > 0) {
-                    const finalSampleGroups = tokenGroups.slice(0, Math.min(25, tokenGroups.length)); // 샘플 늘리기
+                    const finalSampleGroups = tokenGroups.slice(0, Math.min(25, tokenGroups.length)); 
                     console.log("최종 병합 그룹 샘플 v4 (텍스트):", finalSampleGroups.map(group =>
-                        group.map(hIndex => hidableElements[hIndex] ? hidableElements[hIndex].textContent : '?').join('') // 공백 없이 붙여보기
+                        group.map(hIndex => hidableElements[hIndex] ? hidableElements[hIndex].textContent : '?').join('') 
                     ));
                 }
             }
 
-            // Internal function to handle the core logic of loading a section's display
             function _loadSectionInternal(newIndexToShow) {
                 if (newIndexToShow < 0 || newIndexToShow >= codeSections.length) return;
                 
-                currentSectionIndex = newIndexToShow; // Update the global currentSectionIndex
+                currentSectionIndex = newIndexToShow; 
                 const section = codeSections[currentSectionIndex];
 
                 sectionTitle.textContent = section.title;
-                difficultyLevel = defaultDifficultyLevel; // 기본 난이도 적용
+                difficultyLevel = defaultDifficultyLevel; 
                 hiddenIndices.clear();
                 hiddenGroupIndices.clear();
                 hidableElements = [];
 
-                // 코드를 로드하고 Prism으로 하이라이트 (left pane)
                 codeDisplay.textContent = section.code;
                 
-                // Prism이 토큰을 생성할 수 있도록 시간을 줌
                 requestAnimationFrame(() => {
                     Prism.highlightElement(codeDisplay);
                     
-                    // 하이라이트 처리가 완료된 후 토큰 요소 수집
                     requestAnimationFrame(() => {
                         prepareHidableElements();
-                        // 난이도에 맞게 요소 숨기기
                         applyDifficultyLevel();
-                        updateDisplay(); // Updates left pane hidden tokens
+                        updateDisplay(); 
                         updateButtonStates();
                         console.log(`섹션 ${currentSectionIndex} 로드되고 하이라이트되었습니다`);
                     });
                 });
             }
 
-            // Public function to load a section, handling persistence of typed code
             function loadSection(newIndexToLoad) {
-                // Save the currently typed code for the *outgoing* section before changing currentSectionIndex
-                // Ensure userCodeInput exists and currentSectionIndex is a number (it is after first load)
                 if (userCodeInput && typeof currentSectionIndex === 'number') {
                     typedCodePerSection[currentSectionIndex] = userCodeInput.value;
                     console.log(`Saved typed code for section ${currentSectionIndex}:`, userCodeInput.value.substring(0,50) + "...");
                 }
 
-                _loadSectionInternal(newIndexToLoad); // This updates currentSectionIndex to newIndexToLoad
+                _loadSectionInternal(newIndexToLoad); 
 
-                // Restore typed code for the *newly loaded* section
                 if (userCodeInput) {
                     userCodeInput.value = typedCodePerSection[currentSectionIndex] || "";
                     console.log(`Restored typed code for section ${currentSectionIndex}:`, userCodeInput.value.substring(0,50) + "...");
-                    updateHighlighting(); // Update syntax highlighting for the restored code
+                    updateHighlighting(); 
                 }
             }
 
-
-            // 디스플레이 업데이트
             function updateDisplay() {
                 console.log(`화면 업데이트: 난이도=${difficultyLevel}, 숨겨진 토큰=${hiddenIndices.size}/${hidableElements.length}`);
-
-                // 항상 hiddenIndices 기준으로 .hidden-token 클래스 적용
                 hidableElements.forEach((el, index) => {
-                    if (hiddenIndices.has(index)) { // difficultyLevel >= maxDifficulty 조건 제거
+                    if (hiddenIndices.has(index)) { 
                         el.classList.add('hidden-token');
                     } else {
                         el.classList.remove('hidden-token');
@@ -636,7 +608,6 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 });
             }
 
-            // 버튼 상태 업데이트
             function updateButtonStates() {
                 difficultyUpBtn.disabled = (difficultyLevel >= maxDifficulty);
                 difficultyUpBtn.classList.toggle('active', difficultyLevel < maxDifficulty);
@@ -648,7 +619,6 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 nextButton.disabled = (currentSectionIndex === codeSections.length - 1);
             }
 
-            // --- 테마 설정 ---
             function setTheme(isDarkMode) { 
                 htmlElement.classList.toggle('dark-mode', isDarkMode);
                 localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
@@ -659,10 +629,8 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
             themeToggle.checked = initialDarkMode;
             setTheme(initialDarkMode);
             
-            // --- 이벤트 리스너 ---
             themeToggle.addEventListener('change', (event) => setTheme(event.target.checked));
             
-            // 난이도 적용 함수 (그룹 개수 기준으로 변경)
             function applyDifficultyLevel() {
                 const totalGroups = tokenGroups.length;
                 if (totalGroups === 0) {
@@ -676,8 +644,7 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 if (difficultyLevel >= maxDifficulty) {
                     hideRatio = 1;
                 } else if (difficultyLevel > 0) {
-                    // 사용자가 마지막으로 설정한 비율 사용
-                    const ratiosByLevel = [0, 0.20, 0.35, 0.50, 0.65, 0.80, 0.90]; // 현재 비율 유지
+                    const ratiosByLevel = [0, 0.20, 0.35, 0.50, 0.65, 0.80, 0.90]; 
                     hideRatio = ratiosByLevel[difficultyLevel];
                 }
 
@@ -700,19 +667,17 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                     for (let i = 0; i < totalGroups; i++) hiddenGroupIndices.add(i);
                     for (let i = 0; i < hidableElements.length; i++) hiddenIndices.add(i);
                 }
-
                 console.log(`난이도 ${difficultyLevel}, 비율 ${hideRatio}, 숨길 그룹 ${hiddenGroupIndices.size}/${totalGroups}, 숨길 토큰 ${hiddenIndices.size}/${hidableElements.length}`);
             }
             
-            // 난이도 적용 버튼
             applyDifficultyBtn.addEventListener('click', () => {
                 let val = parseInt(startDifficultyInput.value);
                 if (!isNaN(val) && val >= 0 && val <= maxDifficulty) {
                     difficultyLevel = val;
-                    defaultDifficultyLevel = val; // 기본 난이도 업데이트
-                    localStorage.setItem('defaultDifficulty', val); // 로컬 스토리지에 저장
+                    defaultDifficultyLevel = val; 
+                    localStorage.setItem('defaultDifficulty', val); 
                     hiddenIndices.clear();
-                    hiddenGroupIndices.clear(); // 그룹 인덱스도 클리어
+                    hiddenGroupIndices.clear(); 
                     applyDifficultyLevel();
                     updateDisplay();
                     updateButtonStates();
@@ -720,40 +685,29 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 }
             });
             
-            // 난이도 업 버튼 (누적 방식 적용)
             difficultyUpBtn.addEventListener('click', () => {
                 console.log(`난이도 업 클릭: 현재=${difficultyLevel}, 최대=${maxDifficulty}`);
                 if (difficultyLevel >= maxDifficulty || tokenGroups.length === 0) return;
-            
                 difficultyLevel++;
-            
-                // 새 난이도의 목표 숨김 그룹 수 계산
                 let hideRatio = 0;
                 if (difficultyLevel >= maxDifficulty) hideRatio = 1;
                 else {
-                    const ratiosByLevel = [0, 0.20, 0.35, 0.50, 0.65, 0.80, 0.90]; // 현재 비율 유지
+                    const ratiosByLevel = [0, 0.20, 0.35, 0.50, 0.65, 0.80, 0.90]; 
                     hideRatio = ratiosByLevel[difficultyLevel];
                 }
                 const targetHiddenGroupCount = Math.ceil(tokenGroups.length * hideRatio);
                 const currentHiddenGroupCount = hiddenGroupIndices.size;
                 const numGroupsToHideAdditionally = Math.max(0, targetHiddenGroupCount - currentHiddenGroupCount);
-            
                 console.log(` -> 새 난이도 ${difficultyLevel}, 목표 그룹 ${targetHiddenGroupCount}, 추가 숨김 ${numGroupsToHideAdditionally}`);
-            
                 if (numGroupsToHideAdditionally > 0) {
-                    // 현재 보이는 그룹들의 인덱스 찾기
                     const visibleGroupIndices = [];
                     for (let i = 0; i < tokenGroups.length; i++) {
                         if (!hiddenGroupIndices.has(i)) {
                             visibleGroupIndices.push(i);
                         }
                     }
-            
-                    // 보이는 그룹 중에서 추가로 숨길 그룹 무작위 선택
                     shuffleArray(visibleGroupIndices);
                     const groupsToHideNow = visibleGroupIndices.slice(0, numGroupsToHideAdditionally);
-            
-                    // 선택된 그룹 및 해당 토큰 인덱스 숨김 처리
                     groupsToHideNow.forEach(groupIdx => {
                         hiddenGroupIndices.add(groupIdx);
                         if (tokenGroups[groupIdx]) {
@@ -761,44 +715,31 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                         }
                     });
                 } else if (difficultyLevel >= maxDifficulty) {
-                    // 최대 난이도 도달 시 모든 그룹/토큰 숨김 처리 확실히
                     for (let i = 0; i < tokenGroups.length; i++) hiddenGroupIndices.add(i);
                     for (let i = 0; i < hidableElements.length; i++) hiddenIndices.add(i);
                 }
-            
                 updateDisplay();
                 updateButtonStates();
                 console.log(` -> 최종 숨겨진 그룹 ${hiddenGroupIndices.size}, 토큰 ${hiddenIndices.size}`);
             });
             
-            // 난이도 다운 버튼 (누적 방식 적용)
             difficultyDownBtn.addEventListener('click', () => {
                 console.log(`난이도 다운 클릭: 현재=${difficultyLevel}`);
                 if (difficultyLevel <= 0 || tokenGroups.length === 0) return;
-            
                 difficultyLevel--;
-            
-                // 새 난이도의 목표 숨김 그룹 수 계산
                 let hideRatio = 0;
                 if (difficultyLevel > 0) {
-                    const ratiosByLevel = [0, 0.20, 0.35, 0.50, 0.65, 0.80, 0.90]; // 현재 비율 유지
+                    const ratiosByLevel = [0, 0.20, 0.35, 0.50, 0.65, 0.80, 0.90]; 
                     hideRatio = ratiosByLevel[difficultyLevel];
-                } // level 0 이면 hideRatio 0
+                } 
                 const targetHiddenGroupCount = Math.ceil(tokenGroups.length * hideRatio);
                 const currentHiddenGroupCount = hiddenGroupIndices.size;
                 const numGroupsToShow = Math.max(0, currentHiddenGroupCount - targetHiddenGroupCount);
-            
                 console.log(` -> 새 난이도 ${difficultyLevel}, 목표 그룹 ${targetHiddenGroupCount}, 추가 표시 ${numGroupsToShow}`);
-            
                 if (numGroupsToShow > 0) {
-                    // 현재 숨겨진 그룹들의 인덱스 가져오기
                     const currentlyHiddenGroupIndices = Array.from(hiddenGroupIndices);
-            
-                    // 숨겨진 그룹 중에서 다시 표시할 그룹 무작위 선택
                     shuffleArray(currentlyHiddenGroupIndices);
                     const groupsToShowNow = currentlyHiddenGroupIndices.slice(0, numGroupsToShow);
-            
-                    // 선택된 그룹 및 해당 토큰 인덱스 표시 처리 (Set에서 제거)
                     groupsToShowNow.forEach(groupIdx => {
                         hiddenGroupIndices.delete(groupIdx);
                         if (tokenGroups[groupIdx]) {
@@ -806,40 +747,33 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                         }
                     });
                 } else if (difficultyLevel === 0) {
-                    // 난이도 0이면 확실히 모두 표시
                     hiddenGroupIndices.clear();
                     hiddenIndices.clear();
                 }
-            
                 updateDisplay();
                 updateButtonStates();
                 console.log(` -> 최종 숨겨진 그룹 ${hiddenGroupIndices.size}, 토큰 ${hiddenIndices.size}`);
             });
             
-            // 리셋 버튼
             resetButton.addEventListener('click', () => {
                 difficultyLevel = 0;
                 hiddenIndices.clear();
-                hiddenGroupIndices.clear(); // 그룹 인덱스도 클리어
-                applyDifficultyLevel(); // 비율 0으로 다시 계산
+                hiddenGroupIndices.clear(); 
+                applyDifficultyLevel(); 
                 updateDisplay();
                 updateButtonStates();
             });
             
-            // 이전 섹션 버튼
             prevButton.addEventListener('click', () => {
                 if (currentSectionIndex > 0) loadSection(currentSectionIndex - 1);
             });
             
-            // 다음 섹션 버튼
             nextButton.addEventListener('click', () => {
                 if (currentSectionIndex < codeSections.length - 1) loadSection(currentSectionIndex + 1);
             });
             
-            // 초기 섹션 로드 - 기본 난이도 적용
             loadSection(0);
 
-            // --- Syntax Highlighting for Typing Area ---
             function syncScroll() {
                 highlightingPre.scrollTop = userCodeInput.scrollTop;
                 highlightingPre.scrollLeft = userCodeInput.scrollLeft;
@@ -847,40 +781,85 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
 
             function updateHighlighting() {
                 const code = userCodeInput.value;
-                // Append a newline if the code ends with a newline.
-                // This helps Prism.js to correctly highlight the last line if it's being edited.
-                // Also handles empty input correctly.
                 highlightingCode.textContent = code + (code.endsWith('\\n') ? '\\n' : ''); 
                 Prism.highlightElement(highlightingCode);
-                syncScroll(); // Ensure scroll is synced after content change
+                syncScroll(); 
             }
 
             userCodeInput.addEventListener('input', updateHighlighting);
             userCodeInput.addEventListener('scroll', syncScroll);
             
-            // Initial highlight if there's any pre-filled text (e.g. from browser cache)
-            // updateHighlighting(); // This is now called within the new loadSection
-
-            // The old wrapper for loadSection is removed as its logic is now in the new loadSection.
-            
             userCodeInput.addEventListener('input', () => {
                 updateHighlighting();
-                // Continuously save as user types for the current section
                 if (typeof currentSectionIndex === 'number') {
                     typedCodePerSection[currentSectionIndex] = userCodeInput.value;
                 }
             });
             userCodeInput.addEventListener('scroll', syncScroll);
             
-            // Ensure highlighting is updated if theme changes (mainly for caret color)
             const originalSetTheme = setTheme;
-            setTheme = (isDarkMode) => {
+            setTheme = (isDarkMode) => { // Renamed to avoid conflict, ensure this is intended
                 originalSetTheme(isDarkMode);
-                // Force redraw of caret, not strictly necessary for highlighting but good practice
                 const currentVal = userCodeInput.value;
                 userCodeInput.value = ''; 
                 userCodeInput.value = currentVal;
             };
+
+            // --- Mobile View Toggle Logic ---
+            const mobileViewToggleButton = document.getElementById('mobile-view-toggle');
+            const codeContainerDiv = document.getElementById('code-container');
+            const typingAreaContainerDiv = document.getElementById('typing-area-container');
+            let mobileView_isTypingVisible = false;
+
+            function setupMobileView() {
+                if (!mobileViewToggleButton || !codeContainerDiv || !typingAreaContainerDiv) {
+                    console.warn("Mobile view toggle elements not found.");
+                    return;
+                }
+
+                function updateViewForMobile() {
+                    mobileViewToggleButton.style.display = 'block';
+                    if (mobileView_isTypingVisible) {
+                        codeContainerDiv.style.display = 'none';
+                        typingAreaContainerDiv.style.display = 'flex';
+                        mobileViewToggleButton.textContent = '코드 보기';
+                    } else {
+                        codeContainerDiv.style.display = 'flex';
+                        typingAreaContainerDiv.style.display = 'none';
+                        mobileViewToggleButton.textContent = '연습하기';
+                    }
+                }
+
+                function updateViewForDesktop() {
+                    mobileViewToggleButton.style.display = 'none';
+                    codeContainerDiv.style.display = 'flex';
+                    typingAreaContainerDiv.style.display = 'flex';
+                }
+
+                function handleViewChange() {
+                    if (window.innerWidth <= 640) {
+                        updateViewForMobile();
+                    } else {
+                        updateViewForDesktop();
+                        // Reset mobile state when switching to desktop for consistency
+                        if (mobileView_isTypingVisible) {
+                           mobileView_isTypingVisible = false; 
+                        }
+                    }
+                }
+
+                mobileViewToggleButton.addEventListener('click', () => {
+                    if (window.innerWidth <= 640) {
+                        mobileView_isTypingVisible = !mobileView_isTypingVisible;
+                        updateViewForMobile();
+                    }
+                });
+
+                window.addEventListener('resize', handleViewChange);
+                handleViewChange(); // Initial call
+            }
+
+            setupMobileView(); // Initialize mobile view handling
 
         });
     </script>
