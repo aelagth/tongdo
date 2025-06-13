@@ -385,20 +385,20 @@ model.fit(X_train, Y_train)
                 code: `
 # 8. 테스트에서 성능 판단 #외우기 힘들면 안 외워도 지장 없지만 점수 확인 후 제출시 필요함
 val_pred = model.predict(X_val)
-console.log(f"\\n[검증 결과] ({task_type.toUpperCase()})")
+print(f"\\n[검증 결과] ({task_type})")
 if task_type == '분류':
     val_proba = model.predict_proba(X_val)[:, 1] if y.nunique() == 2 else None
-    console.log("Accuracy :", accuracy_score(Y_val, val_pred))
-    console.log("Precision:", precision_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
-    console.log("Recall :", recall_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
-    console.log("F1 Score :", f1_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
+    print("Accuracy :", accuracy_score(Y_val, val_pred))
+    print("Precision:", precision_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
+    print("Recall :", recall_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
+    print("F1 Score :", f1_score(Y_val, val_pred, average='binary' if y.nunique() == 2 else 'macro'))
     if val_proba is not None:
-        console.log("ROC AUC :", roc_auc_score(Y_val, val_proba))
+        print("ROC AUC :", roc_auc_score(Y_val, val_proba))
 else:
-    console.log("MAE :", mean_absolute_error(Y_val, val_pred))
-    console.log("RMSE :", np.sqrt(mean_squared_error(Y_val, val_pred)))
-    console.log("MAPE :", mean_absolute_percentage_error(Y_val, val_pred))
-    console.log("R² :", r2_score(Y_val, val_pred))
+    print("MAE :", mean_absolute_error(Y_val, val_pred))
+    print("RMSE :", np.sqrt(mean_squared_error(Y_val, val_pred)))
+    print("MAPE :", mean_absolute_percentage_error(Y_val, val_pred))
+    print("R2 :", r2_score(Y_val, val_pred))
                 `.trim()
             },
             {
@@ -425,7 +425,7 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
 
         // --- 페이지 로드 시 실행 ---
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOM 콘텐츠 완전히 로드됨");
+            print("DOM 콘텐츠 완전히 로드됨");
             // DOM References
             const codeDisplay = document.getElementById('code-display');
             const sectionTitle = document.getElementById('section-title');
@@ -498,7 +498,7 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                     const text = span.textContent;
                     return text && !/^[\s\n]+$/.test(text);
                 });
-                console.log(`숨길 수 있는 총 요소(수정 후): ${hidableElements.length}개`);
+                print(`숨길 수 있는 총 요소(수정 후): ${hidableElements.length}개`);
                 groupTokensIntoWords(); 
             }
 
@@ -546,10 +546,10 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                     }
                 }
                 tokenGroups = finalGroups.filter(group => group && group.length > 0); 
-                console.log(`${tokenGroups.length}개의 최종 그룹(병합 후 v4) 생성됨.`);
+                print(`${tokenGroups.length}개의 최종 그룹(병합 후 v4) 생성됨.`);
                 if (tokenGroups.length > 0) {
                     const finalSampleGroups = tokenGroups.slice(0, Math.min(25, tokenGroups.length)); 
-                    console.log("최종 병합 그룹 샘플 v4 (텍스트):", finalSampleGroups.map(group =>
+                    print("최종 병합 그룹 샘플 v4 (텍스트):", finalSampleGroups.map(group =>
                         group.map(hIndex => hidableElements[hIndex] ? hidableElements[hIndex].textContent : '?').join('') 
                     ));
                 }
@@ -577,7 +577,7 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                         applyDifficultyLevel();
                         updateDisplay(); 
                         updateButtonStates();
-                        console.log(`섹션 ${currentSectionIndex} 로드되고 하이라이트되었습니다`);
+                        print(`섹션 ${currentSectionIndex} 로드되고 하이라이트되었습니다`);
                     });
                 });
             }
@@ -585,20 +585,20 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
             function loadSection(newIndexToLoad) {
                 if (userCodeInput && typeof currentSectionIndex === 'number') {
                     typedCodePerSection[currentSectionIndex] = userCodeInput.value;
-                    console.log(`Saved typed code for section ${currentSectionIndex}:`, userCodeInput.value.substring(0,50) + "...");
+                    print(`Saved typed code for section ${currentSectionIndex}:`, userCodeInput.value.substring(0,50) + "...");
                 }
 
                 _loadSectionInternal(newIndexToLoad); 
 
                 if (userCodeInput) {
                     userCodeInput.value = typedCodePerSection[currentSectionIndex] || "";
-                    console.log(`Restored typed code for section ${currentSectionIndex}:`, userCodeInput.value.substring(0,50) + "...");
+                    print(`Restored typed code for section ${currentSectionIndex}:`, userCodeInput.value.substring(0,50) + "...");
                     updateHighlighting(); 
                 }
             }
 
             function updateDisplay() {
-                console.log(`화면 업데이트: 난이도=${difficultyLevel}, 숨겨진 토큰=${hiddenIndices.size}/${hidableElements.length}`);
+                print(`화면 업데이트: 난이도=${difficultyLevel}, 숨겨진 토큰=${hiddenIndices.size}/${hidableElements.length}`);
                 hidableElements.forEach((el, index) => {
                     if (hiddenIndices.has(index)) { 
                         el.classList.add('hidden-token');
@@ -636,7 +636,7 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 if (totalGroups === 0) {
                      hiddenIndices.clear();
                      hiddenGroupIndices.clear();
-                     console.log("적용할 그룹 없음");
+                     print("적용할 그룹 없음");
                      return;
                 }
 
@@ -667,7 +667,7 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                     for (let i = 0; i < totalGroups; i++) hiddenGroupIndices.add(i);
                     for (let i = 0; i < hidableElements.length; i++) hiddenIndices.add(i);
                 }
-                console.log(`난이도 ${difficultyLevel}, 비율 ${hideRatio}, 숨길 그룹 ${hiddenGroupIndices.size}/${totalGroups}, 숨길 토큰 ${hiddenIndices.size}/${hidableElements.length}`);
+                print(`난이도 ${difficultyLevel}, 비율 ${hideRatio}, 숨길 그룹 ${hiddenGroupIndices.size}/${totalGroups}, 숨길 토큰 ${hiddenIndices.size}/${hidableElements.length}`);
             }
             
             applyDifficultyBtn.addEventListener('click', () => {
@@ -681,12 +681,12 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                     applyDifficultyLevel();
                     updateDisplay();
                     updateButtonStates();
-                    console.log(`난이도 ${difficultyLevel} 적용, ${hiddenIndices.size}개 요소 숨김`);
+                    print(`난이도 ${difficultyLevel} 적용, ${hiddenIndices.size}개 요소 숨김`);
                 }
             });
             
             difficultyUpBtn.addEventListener('click', () => {
-                console.log(`난이도 업 클릭: 현재=${difficultyLevel}, 최대=${maxDifficulty}`);
+                print(`난이도 업 클릭: 현재=${difficultyLevel}, 최대=${maxDifficulty}`);
                 if (difficultyLevel >= maxDifficulty || tokenGroups.length === 0) return;
                 difficultyLevel++;
                 let hideRatio = 0;
@@ -698,7 +698,7 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 const targetHiddenGroupCount = Math.ceil(tokenGroups.length * hideRatio);
                 const currentHiddenGroupCount = hiddenGroupIndices.size;
                 const numGroupsToHideAdditionally = Math.max(0, targetHiddenGroupCount - currentHiddenGroupCount);
-                console.log(` -> 새 난이도 ${difficultyLevel}, 목표 그룹 ${targetHiddenGroupCount}, 추가 숨김 ${numGroupsToHideAdditionally}`);
+                print(` -> 새 난이도 ${difficultyLevel}, 목표 그룹 ${targetHiddenGroupCount}, 추가 숨김 ${numGroupsToHideAdditionally}`);
                 if (numGroupsToHideAdditionally > 0) {
                     const visibleGroupIndices = [];
                     for (let i = 0; i < tokenGroups.length; i++) {
@@ -720,11 +720,11 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 }
                 updateDisplay();
                 updateButtonStates();
-                console.log(` -> 최종 숨겨진 그룹 ${hiddenGroupIndices.size}, 토큰 ${hiddenIndices.size}`);
+                print(` -> 최종 숨겨진 그룹 ${hiddenGroupIndices.size}, 토큰 ${hiddenIndices.size}`);
             });
             
             difficultyDownBtn.addEventListener('click', () => {
-                console.log(`난이도 다운 클릭: 현재=${difficultyLevel}`);
+                print(`난이도 다운 클릭: 현재=${difficultyLevel}`);
                 if (difficultyLevel <= 0 || tokenGroups.length === 0) return;
                 difficultyLevel--;
                 let hideRatio = 0;
@@ -735,7 +735,7 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 const targetHiddenGroupCount = Math.ceil(tokenGroups.length * hideRatio);
                 const currentHiddenGroupCount = hiddenGroupIndices.size;
                 const numGroupsToShow = Math.max(0, currentHiddenGroupCount - targetHiddenGroupCount);
-                console.log(` -> 새 난이도 ${difficultyLevel}, 목표 그룹 ${targetHiddenGroupCount}, 추가 표시 ${numGroupsToShow}`);
+                print(` -> 새 난이도 ${difficultyLevel}, 목표 그룹 ${targetHiddenGroupCount}, 추가 표시 ${numGroupsToShow}`);
                 if (numGroupsToShow > 0) {
                     const currentlyHiddenGroupIndices = Array.from(hiddenGroupIndices);
                     shuffleArray(currentlyHiddenGroupIndices);
@@ -752,7 +752,7 @@ submission.to_csv('00000000_result.csv', index=False)# 결과 제출 양식에 �
                 }
                 updateDisplay();
                 updateButtonStates();
-                console.log(` -> 최종 숨겨진 그룹 ${hiddenGroupIndices.size}, 토큰 ${hiddenIndices.size}`);
+                print(` -> 최종 숨겨진 그룹 ${hiddenGroupIndices.size}, 토큰 ${hiddenIndices.size}`);
             });
             
             resetButton.addEventListener('click', () => {
